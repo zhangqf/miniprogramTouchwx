@@ -1,0 +1,50 @@
+<template>
+  <view>
+    
+  </view>
+</template>
+<script>
+const ht = require("../../../js/ht.js");
+
+export default {
+  config: {
+    navigationBarTitleText: ""
+  },
+
+  onLoad(options) {
+    //-- 此处options的URL为转码后的URL,例： "%2Fappframework%2Ftest%2Ftest"
+    var redirectURL = options.RedirectURL;
+    //-- 解码
+    redirectURL = decodeURIComponent(redirectURL);
+
+    setTimeout(function() {
+      wx.scanCode({
+        //调用扫一扫
+        success: function(res) {
+          if (!/\?$/.test(redirectURL)) {
+            redirectURL += "?";
+          } else {
+            redirectURL += "&";
+          }
+
+          ht.navigate({
+            redirectUrl:
+              redirectURL + "ScanCode=" + encodeURIComponent(res.result),
+            isDirect: true,
+            isHasBack: false
+          });
+        },
+        error: function(err) {
+          ht.navigate({
+            redirectUrl: redirectURL,
+            isDirect: true,
+            isHasBack: false
+          });
+        }
+      });
+    }, 500);
+  }
+};
+</script>
+<style lang="less">
+</style>

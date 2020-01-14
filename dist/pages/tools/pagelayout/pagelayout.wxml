@@ -1,0 +1,58 @@
+<view style="position:relative;width:100%;display:flex;flex-direction:column;padding-bottom: 20rpx;" class="{{_isShowEmpSubscribeImage==true?'preventScroll':''}}">
+  <view wx:if="{{_isShowEmpSubscribeImage}}" bindtap="cancelShowEmpSubscribeImage" style="position:absolute;background:rgba(33,33,33,.4);width:100%;height:100%; z-index:11;top:0;left:0">
+    <image src="{{ _subscribeImageURL}}" style="position: flex;left: 0;right: 0;margin:15% auto;top: 13%;height:667rpx;width:680rpx;" />
+  </view>
+  <view style="overflow-y:scroll;flex:1;margin-bottom: 10px;">
+    <view wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateItem" wx:for-index="navigateIndex" wx:key="navigate" style="width:100%;">
+      <view class="navigate" wx:for="{{navigateItem.listModule}}" wx:for-item="listModule" wx:key="key" hidden="{{!navigateItem.isShow}}">
+        <ht-pagelayout-banner wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Banner}}" loading="{{navigateItem.isLoading}}" bannerName="{{listModule.moduleBannerData.bannerName}}" _pid="{{_pid}}"></ht-pagelayout-banner>
+        <ht-pagelayout-empinfo id="empmoudle" bind:eventEmpSubscribe="eventHandleShowSubImage" bind:eventRegister="registerEmp" wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Emp}}" loading="{{navigateItem.isLoading}}" moduleEmpData="{{listModule.moduleEmpData}}" _pid="{{_pid}}"></ht-pagelayout-empinfo>
+        <ht-pagelayout-content wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Content}}" loading="{{navigateItem.isLoading}}" contentName="{{listModule.moduleContentData.contentName}}" _pid="{{_pid}}"></ht-pagelayout-content>
+        <ht-pagelayout-function bind:eventPopupEmpRegister="eventHandlePopupEmpRegister" wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Function}}" moduleFunctionData="{{listModule.moduleFunctionData}}" _pid="{{_pid}}"></ht-pagelayout-function>
+        <block wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Image}}">
+          <view class="ui-content">
+            <image class="ui-picImage" mode="widthFix" src="{{listModule.moduleImageData.imageURL}}" lazy-load="true" show-menu-by-longpress="true" data-url="{{listModule.moduleImageData.linkURL}}" data-linkJumpType="{{listModule.moduleImageData.linkJumpType}}" bindtap="goImageLink" />
+          </view>
+        </block>
+      </view>
+
+    </view>
+  </view>
+  <view style="height:{{NAV_HEIGHT}};"></view>
+  <ui-fixed-view bottom="0" left="0" right="0" wx:if="{{_pageLayoutData.listNavigate.length > 1}}" _pid="{{_pid}}">
+    <view class="fixed-view-content">
+      <view class="fixed-items" style="background:{{_pageLayoutData.navigateBackgroundColor}}" wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateTabItem" wx:key="navigate" data-num="{{index}}" data-isOnlyEmp="{{navigateTabItem.isOnlyEmp}}" bindtap="btntarbar">
+        <image class="tarimg" src="{{index==_activeNavigateIndex?navigateTabItem.selectIcon:navigateTabItem.icon}}" />
+        <view class="displayname" style="color:{{index==_activeNavigateIndex?_pageLayoutData.navigateTitleSelectColor:_pageLayoutData.navigateTitleColor}};">{{navigateTabItem.title}}</view>
+      </view>
+
+    </view>
+  </ui-fixed-view>
+  <ui-popup show="{{ _isShowPopupEmpRegister }}" height="220" background="transparent" _pid="{{_pid}}">
+    <view class="popupEmpRegister">
+      <view class="ui-row" style="height:40px;">
+        <view class="ui-col valign-middle" style="padding-left: 20px;">
+          <view class="ui-col-content valign-middle"></view>
+        </view>
+        <view bindtap="cancelRegisterEmp" class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 40px;">
+          <view class="ui-col-content align-center valign-middle">
+            <span type="x" size="18" color="#000" class="ui-icon icon-x" style="color: #000;font-size: 18px;"></span>
+          </view>
+        </view>
+      </view>
+      <view class="popupEmpRegisterTitle">您还未注册会员</view>
+      <view style="margin-top:30px;height:60px;" class="ui-row">
+        <view style="padding-left:70rpx;padding-right:25rpx;" class="ui-col valign-middle">
+          <view class="ui-col-content valign-middle">
+            <button style="border:#C2C2C2 solid 1px;background:#fff;" bindtap="cancelRegisterEmp">取消</button>
+          </view>
+        </view>
+        <view style="padding-left:25rpx;padding-right:70rpx;" class="ui-col valign-middle">
+          <view class="ui-col-content valign-middle">
+            <button style="background:#166CE6" type="primary" open-type="getPhoneNumber" bindgetphonenumber="registerEmp">注册/绑卡</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </ui-popup>
+</view>

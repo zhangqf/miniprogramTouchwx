@@ -1,0 +1,98 @@
+<view>
+  <!-- 九宫格 -->
+  <view class="ui-content ui-full" wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_Grid}}" style="background:{{moduleFunctionData.backgroundColor}}">
+    <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+    <view wx:for="{{moduleFunctionData.listItem}}" wx:for-item="functionItem" wx:for-index="functionIndex" wx:key="key">
+      <view class="ui-entry {{moduleFunctionData.isShowGridLine != true ?'ui-borderNone':'ui-bordertop'}} ui-row" wx:if="{{functionIndex % moduleFunctionData.showItemNumByRow == 0}}" style="background:{{moduleFunctionData.backgroundColor}};justify-content:initial;height:200rpx;">
+        <view wx:for="{{moduleFunctionData.listItem}}" wx:for-item="functionColItem" wx:for-index="functionColIndex" wx:key="key" wx:if="{{functionColIndex >= functionIndex && functionColIndex < functionIndex + moduleFunctionData.showItemNumByRow}}" class="ui-col {{moduleFunctionData.isShowGridLine !=true?'ui-borderNone': (functionColIndex+1)% moduleFunctionData.showItemNumByRow!=0?'ui-borderRight':'ui-borderNone'}} ui-col valign-middle" style="flex:1;">
+          <view class="ui-col-content valign-middle">
+            <view bindtap="goFucntionLink" hover-class="navigator-hover" class="btnitems" data-jumpType="{{functionColItem.jumpType}}" data-linkJumpType="{{functionColItem.linkJumpType}}" data-url="{{functionColItem.linkURL}}" data-miniProgramAppID="{{functionColItem.miniProgramAppID}}" data-appPath="{{functionColItem.miniProgramPath}}" data-miniProgramPath="{{functionColItem.miniProgramPath}}" data-phone="{{functionColItem.phone}}" data-isNew="{{functionColItem.isNew}}" data-isHot="{{functionColItem.isHot}}" data-isOnlyEmp="{{functionColItem.isOnlyEmp}}" data-isComingSoon="{{functionColItem.isComingSoon}}" data-comingSoonText="{{functionColItem.comingSoonText}}">
+              <!-- <span class="ui-icons icon-xinyongqia ui-size"></span> -->
+              <view wx:if="{{functionColItem.isOnlyEmp}}" class="ui-myiconvip">
+                <image class="ui-myiconvipImage" src="../../images/pagelayout/vip.png" />
+              </view>
+              <view wx:if="{{functionColItem.isHot}}" class="ui-myiconhot">
+                <image class="ui-myiconhotImage" src="../../images/pagelayout/listhot.png" />
+              </view>
+              <view wx:if="{{functionColItem.isComingSoon}}" class="ui-myiconwait">
+                <image class="ui-myiconwaitImage" src="../../images/pagelayout/comingsoon.png" />
+              </view>
+              <view wx:if="{{functionColItem.isNew}}" class="ui-myiconnew">
+                <image class="ui-myiconnewImage" src="../../images/pagelayout/newright.png" />
+              </view>
+              <image wx:if="{{functionColItem.icon!=''&&functionColItem.icon!=null&&functionColItem.icon!=undefined}}" src="{{functionColItem.icon}}" class="ui-entryImage" style="margin:0;" />
+              <text class="ui-clotext" style="margin:0;">{{functionColItem.title}}</text>
+            </view>
+
+          </view>
+        </view>
+        <view wx:if="{{ functionIndex + moduleFunctionData.showItemNumByRow > moduleFunctionData.listItem.length }}" wx:for="{{_emptyFunctionArray}}" wx:key="key" style="flex:1;" class="ui-col">
+          <view class="ui-col-content"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 单行 -->
+  <view class="ui-lineScroll" wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_SingleRow}}" style="background:{{moduleFunctionData.backgroundColor}}">
+    <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+    <scroll-view scroll-x="true" style=" white-space: nowrap; display: flex ;flex-direction: row; enable-flex:true;background: #ffff;height:200rpx;">
+      <view class="ui-lineScrollContent {{moduleFunctionData.isShowGridLine==true?'ui-borderRight':'ui-borderNone'}}" wx:for="{{moduleFunctionData.listItem}}" wx:for-item="lineitem" wx:key="key">
+        <view class="ui-lineScrollContentDisplayFlex" bindtap="goFucntionLink" data-url="{{lineitem.linkURL}}" data-jumpType="{{lineitem.jumpType}}" data-linkJumpType="{{lineitem.linkJumpType}}" data-appid="{{lineitem.miniProgramAppID}}" data-appPath="{{lineitem.miniProgramPath}}" data-phone="{{lineitem.phone}}" data-isNew="{{lineitem.isNew}}" data-isHot="{{lineitem.isHot}}" data-isOnlyEmp="{{lineitem.isOnlyEmp}}" data-isComingSoon="{{lineitem.isComingSoon}}" data-comingSoonText="{{lineitem.comingSoonText}}" hover-class="bg_ccc">
+          <view class="ui-myiconvip" wx:if="{{lineitem.isOnlyEmp}}">
+            <image class="ui-lineScrollvipImage" src="../../images/pagelayout/vip.png" />
+          </view>
+          <view class="ui-myiconhot" wx:if="{{lineitem.isHot}}">
+            <image class="ui-lineScrollhotImage" src="../../images/pagelayout/listhot.png" />
+          </view>
+          <view class="ui-myiconwait" wx:if="{{lineitem.isComingSoon}}">
+            <image class="ui-lineScrollwaitImage" src="../../images/pagelayout/comingsoon.png" />
+          </view>
+          <image wx:if="{{lineitem.icon!=''&&lineitem.icon!=null&&lineitem.icon!='undefined'}}" src="{{lineitem.icon}}" />
+          <text class="ui-lineScrolltext">{{lineitem.title}}</text>
+        </view>
+      </view>
+
+    </scroll-view>
+  </view>
+  <!-- 多行 -->
+  <view class="ui-contentline top_tip" wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_MultiRow}}" style="background:{{moduleFunctionData.backgroundColor}}">
+    <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+    <view hover-class="touchui-hover" wx:for="{{moduleFunctionData.listItem}}" wx:for-item="custom_list" wx:key="key" bindtap="goFucntionLink" data-url="{{custom_list.linkURL}}" data-jumpType="{{custom_list.jumpType}}" data-linkJumpType="{{custom_list.linkJumpType}}" data-appid="{{custom_list.miniProgramAppID}}" data-appPath="{{custom_list.miniProgramPath}}" data-phone="{{custom_list.phone}}" data-isNew="{{custom_list.isNew}}" data-isHot="{{custom_list.isHot}}" data-isOnlyEmp="{{custom_list.isOnlyEmp}}" data-isComingSoon="{{custom_list.isComingSoon}}" data-comingSoonText="{{custom_list.comingSoonText}}" style="border-bottom: 1px solid #e6e6e6;height:55px;" class="ui-row ui-row-border-bottom">
+      <view class="ui-col ui-col-align-center align-center valign-middle" style="flex:0 0 44px;">
+        <view class="ui-col-content align-center valign-middle">
+          <view class="left_icon">
+            <image class="left-iconImage" wx:if="{{custom_list.icon!=''&&custom_list.icon!=null&&custom_list.icon!='undefined'}}" src="{{custom_list.icon}}" />
+          </view>
+        </view>
+      </view>
+      <view class="text ui-col ui-col-align-left align-left valign-middle" style="">
+        <view class="ui-col-content align-left valign-middle">
+          <view class="ui-textrow">
+            <view style="align-items:center;overflow: visible;" class="ui-row">
+              <view class="ui-middle ui-col ui-col-align-left align-left valign-middle" style="">
+                <view class="ui-col-content align-left valign-middle">
+                  <view class="ui-linemiddle">
+                    <text>{{custom_list.title}}</text>
+                    <image wx:if="{{custom_list.isNew}}" class="line-new" src="../../images/pagelayout/newleft.png" />
+                    <image wx:if="{{custom_list.isHot}}" class="line-hot" src="../../images/pagelayout/listhot.png" />
+                    <image wx:if="{{custom_list.isOnlyEmp}}" class="line-vip" src="../../images/pagelayout/listvip.png" />
+                    <image wx:if="{{custom_list.isComingSoon}}" class="line-comingsoon" src="../../images/pagelayout/comingsoon.png" />
+                  </view>
+                </view>
+              </view>
+              <view class="ui-col ui-col-align-right align-right valign-middle" style="padding-right: 10px;flex:0 0 100px;">
+                <view class="ui-col-content align-right valign-middle">
+                  <view class="ui-left">
+                    <text class="clo-text">{{custom_list.description}}</text>
+                    <image class="ui-leftarrow" src="../../images/pagelayout/leftarrow.png" />
+                  </view>
+                </view>
+              </view>
+            </view>
+
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

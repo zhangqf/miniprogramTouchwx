@@ -1,0 +1,318 @@
+
+
+<template>
+<import src="../../plugin/wxParse/wxParse.wxml"/>
+    <view>
+    <view class="banner" wx:for="{{_currNavigate.listModule}}" wx:for-item="listModule" wx:key="key">
+      <ht-pagelayout-banner wx:if="{{listModule.moduleType==910}}" loading={{_loading}} bannerName="{{listModule.moduleBannerData.bannerName}}" ></ht-pagelayout-banner>
+      <ht-pagelayout-empinfo wx:if="{{listModule.moduleType==110}}" loading={{_loading}} empDataContent="{{listModule.moduleEmpData}}" ></ht-pagelayout-empinfo>
+      <ht-pagelayout-content wx:if="{{listModule.moduleType==920}}" loading={{_loading}} contentName="{{listModule.moduleContentData.contentName}}"></ht-pagelayout-content>
+      <ht-pagelayout-function wx:if="{{listModule.moduleType==930}}" loading={{_loading}} functionContent="{{listModule.moduleFunctionData}}"></ht-pagelayout-function>
+
+      <block wx:if="{{listModule.moduleType==900}}">
+           <view class="ui-content">
+             <image class="ui-picImage" mode="widthFix" src="{{listModule.moduleImageData.imageURL}}" lazy-load=true show-menu-by-longpress=true data-url="{{listModule.moduleImageData.linkURL}}"
+             data-linkJumpType="{{listModule.moduleImageData.linkJumpType}}" bindtap="goImageLink"/>
+           </view>
+       </block>
+      
+    </view>
+     <ui-fixed-view bottom="0" left="0" right="0" wx:if="{{_pageLayoutData.listNavigate.length>1}}" >
+            <view class="fixed-view-content" >
+                <view class="fixed-items" style="background:{{_pageLayoutData.navigateBackgroundColor}}"
+                wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateTabItem"  wx:key="navigate" data-num="{{index}}" data-isOnlyEmp="{{navigateTabItem.isOnlyEmp}}"
+                bindtap="btntarbar">
+                    <image class="tarimg" src="{{index==_activeNavigateIndex?navigateTabItem.selectIcon:navigateTabItem.icon}}"/>
+                    <view class="displayname" style="color:{{index==_activeNavigateIndex?_pageLayoutData.navigateTitleSelectColor:_pageLayoutData.navigateTitleColor}};">{{navigateTabItem.title}}</view>
+                </view>
+                <!-- <view class="fixed-items" hover-class="btn_hover_list">c</view> --> 
+            </view>
+    </ui-fixed-view>
+    </view>
+</template>
+
+<script>
+const ht = require("../../js/ht.js");
+const storage = require("../../js/storage.js");
+const config = require("../../js/config.js");
+const app = getApp();
+const WxParse = require("../../plugin/wxParse/wxParse.js");
+
+export default {
+  config: {
+    navigationBarTitleText: "首页",
+    backgroundColor: "#F4F4F4",
+    navigationBarTextStyle: "black",
+     usingComponents:{
+        'ht-pagelayout-banner':'../../package/pagelayout/ht-pagelayout-banner',
+        'ht-pagelayout-content':'../../package/pagelayout/ht-pagelayout-content',
+        'ht-pagelayout-function':'../../package/pagelayout/ht-pagelayout-function',
+        'ht-pagelayout-empinfo':'../../package/pagelayout/ht-pagelayout-empinfo',
+    },
+    
+  },
+  data: {
+    _loading: false,
+    _currNavigate:null,
+     _enumData: {
+      PageLayoutNavigateTypeEnum_SystemPage: 10,
+      PageLayoutNavigateTypeEnum_JumpMiniProgram: 20,
+      PageLayoutNavigateTypeEnum_JumpLink: 30,
+
+      //-- 页面布局链接跳转类型
+      PageLayoutLinkJumpTypeEnum_Direct: 10,
+      PageLayoutLinkJumpTypeEnum_AppLoadingURL: 20,
+
+      //--页面布局导航模块类型
+      PageLayoutNavigateModuleTypeEnum_Emp: 110,
+      PageLayoutNavigateModuleTypeEnum_Image: 900,
+      PageLayoutNavigateModuleTypeEnum_Banner: 910,
+      PageLayoutNavigateModuleTypeEnum_Content: 920,
+      PageLayoutNavigateModuleTypeEnum_Function: 930,
+
+      //-- 会员模块显示项类型
+      PageLayoutNavigateModuleEmpItemTypeEnum_Balance: 110,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Point: 120,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Growth: 130,
+      PageLayoutNavigateModuleEmpItemTypeEnum_EmpLevel: 210,
+      PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum: 310,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Custom: 999,
+
+      //-- 会员模块显示项类型
+      PageLayoutNavigateModuleFunctionJumpLink_Direct: 10,
+      PageLayoutNavigateModuleFunctionJumpLink_Apploading: 20,
+      PageLayoutNavigateModuleFunctionJumpLink_Openloading: 30,
+
+      PageLayoutNavigateModuleFunctionJumpLink_Urltype: 110,
+      PageLayoutNavigateModuleFunctionJumpLink_Miniprogramtype: 210,
+      PageLayoutNavigateModuleFunctionJumpLink_Callphonetype: 810
+    }
+  },
+
+  onLoad(options) {
+
+    var pageMain = this;
+    // 登录
+    ht.login({
+      aleardyLogin() {
+         pageMain.setData({"_loading":true});
+          pageMain.getPageLayoutData(options.PageLayoutName);
+       
+      },
+      loginSuccess(data) {
+          console.log(data)
+          if(data!=null){
+               pageMain.setData({"_loading":true});
+          }
+            console.log(2)
+        pageMain.getPageLayoutData(options.PageLayoutName);
+      },
+      loginFail() {
+        //-- 提示，退出
+      }
+    });
+  },
+  
+  getPageLayoutData:function(pageLayoutName){
+       const pageMain = this;
+
+    if (pageLayoutName == "" || pageLayoutName == undefined) {
+      pageLayoutName = config.defaultPageLayoutName;
+    }
+    if(pageMain.data._loading){
+      ht.setForm({
+      url: "/pageLayout/GetEntityByNameAsync",
+      data: {
+        value: pageLayoutName
+      },
+      success: function(data) {
+        //-- 处理导航图标
+        data.listNavigate.forEach(navigateItem => {
+          if (navigateItem.selectIcon == null || navigateItem.selectIcon == "" || navigateItem.selectIcon == undefined ) {
+            navigateItem.selectIcon = navigateItem.icon;
+          }
+        });
+
+        pageMain.setData({
+          _pageLayoutData: data
+        });
+
+        //-- 初始化导航
+        pageMain.initNavigateTab(data);
+        //-- 显示第一项
+        pageMain.changeNavigate(0);
+      },
+      fail: function(data) {}
+    });
+     }
+  },
+      // 动态导航配置
+  initNavigateTab(data) {
+    //   动态设置当前页面的标题
+    wx.setNavigationBarTitle({
+      title: data.displayName
+    });
+
+    // 设置页面导航条颜色
+    wx.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: data.navigateBackgroundColor,
+      animation: {
+        //动画效果
+        duration: 400, //动画变化的时间 ms
+        timingFunc: "easeIn" // 动画变化方式 linear easeOut easeIn easeInOut
+      },
+      success: function() {},
+      fail: function() {},
+      complete: function() {}
+    });
+
+    // 设置底部导航
+    wx.setTabBarStyle({
+      color: "#FF0000",
+      selectedColor: "#00FF00",
+      backgroundColor: "#0000FF",
+      borderStyle: "white"
+    });
+  },
+
+  // 设置单个导航的数据
+  changeNavigate(index) {
+    var pageMain = this;
+
+    var currNavigate = pageMain.data._pageLayoutData.listNavigate[index];
+
+    if (currNavigate.navigateType ==pageMain.data._enumData.PageLayoutNavigateTypeEnum_SystemPage) {
+      this.showNaivgate(index);
+    } else if (currNavigate.navigateType = pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpMiniProgram) {
+      ht.navigateToMiniprogram({
+        appID: currNavigate.miniProgramAppID,
+        path: currNavigate.miniProgramPath
+      });
+    } else if (currNavigate.navigateType =pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpLink) {
+      if (currNavigate.LinkJumpType == pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct) {
+        //直跳
+        ht.navigate({
+          redirectUrl: url,
+          isDirect: true
+        });
+      } else if (currNavigate.LinkJumpType ==pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct) {
+        //apploading跳转
+        ht.navigate({
+          redirectUrl: url
+        });
+      }
+    }
+  },
+    // 页面信息
+  showNaivgate(index) {
+    var pageMain = this;
+
+    var pageLauoutData = pageMain.data._pageLayoutData;
+    var navigateData = pageLauoutData.listNavigate[index];
+    pageMain.setData({
+        _currNavigate:pageLauoutData.listNavigate[index]
+    }) 
+  },
+
+  goImageLink(e) {
+    const url = e.currentTarget.dataset.url;
+    const linkjumptype = e.currentTarget.dataset.linkjumptype;
+    if (
+      linkjumptype == this.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+    ) {
+
+      //直跳
+      ht.navigate({
+        redirectUrl: url,
+        isDirect: true
+      });
+    } else if (
+      linkjumptype == this.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+    ) {
+      //apploading跳转
+      ht.navigate({
+        redirectUrl: url
+      });
+    }
+  },
+ btntarbar(e) {
+    const pageMain = this;
+
+    const index = e.currentTarget.dataset.num;
+    const isOnlyEmp = e.currentTarget.dataset.isonlyemp;
+    if (isOnlyEmp && !storage.isBindEmp()) {
+      wx.showModal({
+        title: "提示",
+        content: "请先注册为会员",
+        success: function(sm) {
+          if (sm.confirm) {
+          } else if (sm.cancel) {
+          }
+        }
+      });
+    } else {
+      pageMain.setData({
+        _activeNavigateIndex: index
+      });
+
+      pageMain.changeNavigate(index);
+    }
+  },
+  onShow(options) {}
+};
+</script>
+
+<style lang="less">
+@import "./static/utils/mixins.less";
+.ui-content {
+  width: 718rpx;
+  margin: 0 auto;
+  box-sizing: content-box;
+  padding: 16rpx;
+  padding-top: 21rpx;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+  }
+page {
+  background: #f7f7f7;
+//   display: flex;
+}
+.banner{
+width: 100%;
+}
+.ui-picImage {
+  width: 100%;
+}
+.fixed-view-content {
+  padding: 0 0;
+  height: 98rpx;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  color: #fff;
+  background-color: #ccc;
+  z-index: 99;
+  .fixed-items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .tarimg {
+    width: 44rpx;
+    height: 44rpx;
+    margin-bottom: 8rpx;
+    margin-top: 7rpx;
+  }
+  .displayname {
+    font-size: 22rpx;
+    color: #000;
+  }
+}
+</style>
+

@@ -1,0 +1,52 @@
+<template>
+  <page></page>
+</template>
+
+<script>
+import system from './static/utils/system'
+const ht = require('./js/ht.js')
+
+export default {
+  config: {
+    usingComponents: {},
+    pages: [      
+    //   'pages/test/testcomponent',
+      'pages/tools/pagelayout/pagelayout',
+    //    'pages/tools/pagelayout/pagelayout1',
+      //'pages/home/index',
+      'pages/tools/scancode/scancode',
+      'pages/tools/webview/webview',
+      //'pages/tools/pay/pay',
+    //   'pages/test/test',
+    ],
+    window: {
+      backgroundTextStyle: 'dark',
+      backgroundColor: '#efefef',
+      navigationBarBackgroundColor: '#ffffff',
+      navigationBarTitleText: 'TouchUI',
+      navigationBarTextStyle: 'black'
+    },
+    networkTimeout: {
+      request: 30000
+    },
+    theme: {
+      'theme-color': '#39f'
+    }
+  },
+
+  globalData: {},
+  onLaunch() {
+    system.attachInfo()
+  },
+  onShow(options) {},
+  onHide() {}
+}
+</script>
+
+<style lang="less">
+@import "./static/styles/index.less";
+@import "./static/utils/mixins.less";
+.ui-popup-content.bottom {
+    bottom:36%;
+}
+</style>

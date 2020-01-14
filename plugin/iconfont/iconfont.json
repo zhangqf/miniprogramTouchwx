@@ -1,0 +1,72 @@
+{
+  "id": "729121",
+  "name": "mui-icon-custom",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "597997",
+      "name": "出差 旅游 出行",
+      "font_class": "chuchalvyouchuxing",
+      "unicode": "e64c",
+      "unicode_decimal": 58956
+    },
+    {
+      "icon_id": "637167",
+      "name": "理财",
+      "font_class": "licai",
+      "unicode": "e67a",
+      "unicode_decimal": 59002
+    },
+    {
+      "icon_id": "667215",
+      "name": "缴费记录",
+      "font_class": "1",
+      "unicode": "e640",
+      "unicode_decimal": 58944
+    },
+    {
+      "icon_id": "933624",
+      "name": "服务",
+      "font_class": "fuwu",
+      "unicode": "e60c",
+      "unicode_decimal": 58892
+    },
+    {
+      "icon_id": "1833771",
+      "name": "手机充值",
+      "font_class": "shoujichongzhi",
+      "unicode": "e732",
+      "unicode_decimal": 59186
+    },
+    {
+      "icon_id": "4532933",
+      "name": "购物车-23",
+      "font_class": "gouwuche",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "5220894",
+      "name": "用餐区 ",
+      "font_class": "tubiao-",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "5403198",
+      "name": "信用卡",
+      "font_class": "xinyongqia",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "6460203",
+      "name": "借钱",
+      "font_class": "jieqian",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    }
+  ]
+}

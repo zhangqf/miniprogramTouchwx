@@ -1,0 +1,44 @@
+<template>
+  <view>
+    <web-view src="{{_url}}" bindmessage="getMessage">{{_url}}</web-view>
+  </view>
+</template>
+
+<script>
+const config = require("../../../js/config.js");
+const ht = require("../../../js/ht.js");
+
+export default {
+  config: {
+    navigationBarTitleText: ""
+  },
+  data: {
+    _url: ""
+  },
+
+  onLoad(options) {
+    //-- 此处options的URL为转码后的URL,例： "%2Fappframework%2Ftest%2Ftest"
+
+    var url = options.RedirectURL;
+    var isDirect = options.IsDirect;
+
+    //-- 解码
+    url = decodeURIComponent(url);
+
+    //-- 增加网站前缀
+    if(!(/^http/.test(url))){
+      url = config.appPath + url;
+    }
+
+    if (isDirect != "1") {
+      url = ht.getAppLoadingURL(url);
+    }
+
+    this.setData({
+      _url: url
+    });
+  }
+};
+</script>
+<style lang="less">
+</style>

@@ -1,0 +1,134 @@
+<view class="ui-content" style="margin-bottom:24rpx;position:relative;">
+
+  <view class="personal" style="background-image:url({{_imageUrl}});background-repeat: no-repeat;background-size:100%">
+    <block wx:if="{{_empStatusRegister}}">
+      <view class="personal-title">
+        <image class="image" data-url="{{moduleEmpData.clickLogoJumpURL}}" bindtap="clickEmpLogo" src="{{_avatarUrl}}" />
+        <view class="ui-radius">
+          <text class="person-emName">{{_empDisplayName}}</text>
+          <view wx:if="{{moduleEmpData.isShowEmpLevel}}" class="person-empLevel">{{_empInfo.empLevelDisplayName}}</view>
+          <view class="ui-secondRow">
+            <text class="person-secondRow" wx:if="{{moduleEmpData.isShowEmpEndDay}}">{{_empInfo.endDay}}</text>
+            <text class="person-secondRow" wx:if="{{moduleEmpData.isShowPhone && _empInfo.phone}}">{{moduleEmpData.isShowPhoneFilter==false?_empInfo.phone:_empInfo.phoneFilter}}</text>
+          </view>
+        </view>
+        <image wx:if="{{moduleEmpData.isShowEmpQRCode}}" bindtap="linkToEmpQRcode" class="person-qrcode" src="../../images/pagelayout/QRcode.png" />
+      </view>
+      <view class="ui-text" style="color:{{moduleEmpData.empNameColor}}" wx:if="{{moduleEmpData.isShowEmpName}}">{{_empInfo.empName}}</view>
+      <view class="ui-personalitems">
+        <view wx:if="{{moduleEmpData.isShowPerfectEmpInfo && _empInfo.isShowPerfectEmpInfo}}" bindtap="linkToPerfectEmp" class="ui-personalitem">
+          <image class="ui-tipimg person-perfectinformation" src="../../images/pagelayout/perfectinformation.png" />完善资料</view>
+        <view wx:if="{{moduleEmpData.isShowSignIn && _empInfo.isShowSignIn}}" bindtap="linkToEmpSignIn" class="ui-personalitem">
+          <image class="ui-tipimg person-signin" src="../../images/pagelayout/signin.png" />签到有礼</view>
+        <view wx:if="{{moduleEmpData.isShowWeixinEmpSubscribe && _empInfo.isShowWeixinEmpSubscribe}}" bindtap="linkToEmpSubscribe" class="ui-personalitem">
+          <image class="ui-tipimg person-membernotification" src="../../images/pagelayout/membernotification.png" />开启通知</view>
+      </view>
+    </block>
+    <block wx:else="">
+      <view class="personal-title">
+        <image class="image" src="{{_avatarUrl}}" />
+        <view class="ui-radius">
+          <text class="person-emName">{{_empDisplayName}}</text>
+        </view>
+      </view>
+      <view class="ui-button" wx:if="{{_canIUse&&!_empStatusGrant}}">
+        <button open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="grantUserInfo">授权登录</button>
+      </view>
+      <view class="ui-button" wx:if="{{_empStatusGrant}}">
+        <button open-type="getPhoneNumber" lang="zh_CN" bindgetphonenumber="registerEmp">开通会员</button>
+      </view>
+    </block>
+
+  </view>
+  <view class="emp-item" wx:if="{{moduleEmpData.listItem.length>0}}">
+    <view wx:for="{{moduleEmpData.listItem}}" wx:for-item="empitem" wx:for-index="empIndex" wx:key="key" wx:if="{{empIndex<=3}}">
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Balance}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{_empInfo.empMoney==null}}">-</view>
+          <view wx:else=""> {{_empInfo.empMoney}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!='undefined'&&empitem.title!=null ? empitem.title : "储值"}}</view>
+        </view>
+      </view>
+
+
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Point}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{_empInfo.empPoint==null}}">-</view>
+          <view wx:else=""> {{_empInfo.empPoint}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!=undefined && empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!= undefined &&empitem.title!=null ? empitem.title : "积分"}}</view>
+        </view>
+      </view>
+
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Growth}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{_empInfo.empGrowth==null}}">-</view>
+          <view wx:else=""> {{_empInfo.empGrowth}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!='undefined'&&empitem.title!=null ? empitem.title : "成长值"}}</view>
+        </view>
+      </view>
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_EmpLevel}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{_empInfo.empLevelDisplayName==null}}">-</view>
+          <view wx:else=""> {{_empInfo.empLevelDisplayName}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!='undefined'&&empitem.title!=null ? empitem.title : "等级"}}</view>
+        </view>
+      </view>
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{_empInfo.couponNum==null}}">-</view>
+          <view wx:else=""> {{_empInfo.couponNum}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!='undefined'&&empitem.title!=null ? empitem.title : "优惠券"}}</view>
+        </view>
+      </view>
+
+      <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Custom}}">
+        <view class="ui-empitemsNo">
+          <view wx:if="{{empitem.customValue==null||empitem.customValue==undefined || empitem.customValue==''}}">-</view>
+          <view wx:else=""> {{empitem.customValue}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+        </view>
+        <view class="ui-empitemstitle">
+          <image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt="" />
+          <view wx:if="{{empitem.isShowTitle}}">{{empitem.title!=''&&empitem.title!= undefined &&empitem.title!=null ? empitem.title : "自定义"}}</view>
+        </view>
+      </view>
+
+
+      <!-- <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Point}}">
+                       <view class="ui-empitemsNo">{{_empInfo.empPoint==null?"-":_empInfo.empPoint}} {{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+                   <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>积分</view>
+                 </view>
+                 <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Growth}}">
+                     <view class="ui-empitemsNo">{{_empInfo.empGrowth==null?"-":_empInfo.empGrowth}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+                     <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>成长值</view>
+                 </view>
+                 <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_EmpLevel}}">
+                     <view class="ui-empitemsNo">{{_empInfo.empLevelDisplayName==null?"-":_empInfo.empLevelDisplayName}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+                     <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>等级</view>
+                 </view>
+                 <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum}}">
+                     <view class="ui-empitemsNo">{{_empInfo.couponNum==null?"-":_empInfo.couponNum}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+                     <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>优惠券</view>
+                 </view>
+                 <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Custom}}">
+                     <view class="ui-empitemsNo">{{_empInfo.customValue==null?"-":_empInfo.customValue}}{{empitem.unitDisplayName==null?"":empitem.unitDisplayName}}</view>
+                     <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>{{empitem.title}}</view>
+                 </view> -->
+    </view>
+  </view>
+
+</view>

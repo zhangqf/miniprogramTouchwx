@@ -1,0 +1,634 @@
+<template>
+  <view>
+    <!-- 九宫格 -->              
+    <view class="ui-content ui-full" wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_Grid}}" style="background:{{moduleFunctionData.backgroundColor}}">
+        <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+        <view  wx:for="{{moduleFunctionData.listItem}}" wx:for-item="functionItem" wx:for-index="functionIndex" wx:key="key">
+            <ui-row  class="ui-entry {{moduleFunctionData.isShowGridLine != true ?'ui-borderNone':'ui-bordertop'}}" wx:if="{{functionIndex % moduleFunctionData.showItemNumByRow == 0}}"  
+            style="background:{{moduleFunctionData.backgroundColor}};justify-content:initial;height:200rpx;">
+                <ui-col wx:for="{{moduleFunctionData.listItem}}" 
+                    wx:for-item="functionColItem" 
+                    wx:for-index="functionColIndex"  
+                    wx:key="key"
+                    wx:if="{{functionColIndex >= functionIndex && functionColIndex < functionIndex + moduleFunctionData.showItemNumByRow}}" 
+                    vertical-align="middle"
+                    class="ui-col {{moduleFunctionData.isShowGridLine !=true?'ui-borderNone': (functionColIndex+1)% moduleFunctionData.showItemNumByRow!=0?'ui-borderRight':'ui-borderNone'}}" 
+                    style="flex:1"> 
+                    <view bindtap="goFucntionLink" hover-class="navigator-hover" class="btnitems"  
+                      data-jumpType="{{functionColItem.jumpType}}"
+                      data-linkJumpType="{{functionColItem.linkJumpType}}"  data-url="{{functionColItem.linkURL}}" 
+                      data-miniProgramAppID ="{{functionColItem.miniProgramAppID}}" 
+                      data-appPath = "{{functionColItem.miniProgramPath}}" 
+                      data-miniProgramPath ="{{functionColItem.miniProgramPath}}" 
+                      data-phone="{{functionColItem.phone}}" 
+                      data-isNew="{{functionColItem.isNew}}" data-isHot="{{functionColItem.isHot}}" data-isOnlyEmp="{{functionColItem.isOnlyEmp}}" 
+                      data-isComingSoon="{{functionColItem.isComingSoon}}" data-comingSoonText="{{functionColItem.comingSoonText}}" >
+                              <!-- <span class="ui-icons icon-xinyongqia ui-size"></span> -->
+                     <view wx:if="{{functionColItem.isOnlyEmp}}" class="ui-myiconvip"><image class="ui-myiconvipImage" src="../../images/pagelayout/vip.png" /></view>
+                     <view wx:if="{{functionColItem.isHot}}" class="ui-myiconhot" ><image class="ui-myiconhotImage" src="../../images/pagelayout/listhot.png" /></view>
+                     <view wx:if="{{functionColItem.isComingSoon}}" class="ui-myiconwait">
+                         <image class="ui-myiconwaitImage" src="../../images/pagelayout/comingsoon.png" />
+                     </view>
+                         <view wx:if="{{functionColItem.isNew}}" class="ui-myiconnew" ><image class="ui-myiconnewImage" src="../../images/pagelayout/newright.png" /></view>
+                     <image wx:if="{{functionColItem.icon!=''&&functionColItem.icon!=null&&functionColItem.icon!=undefined}}" src="{{functionColItem.icon}}" class="ui-entryImage" style="margin:0;" />
+                     <text class="ui-clotext" style="margin:0;">{{functionColItem.title}}</text>
+                    </view>                           
+      
+                </ui-col>
+                <ui-col wx:if="{{ functionIndex + moduleFunctionData.showItemNumByRow > moduleFunctionData.listItem.length }}" 
+                        wx:for="{{_emptyFunctionArray}}" wx:key="key" style="flex:1"></ui-col>
+            </ui-row> 
+        </view>
+    </view>
+    <!-- 单行 -->
+    <view class="ui-lineScroll" wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_SingleRow}}" style="background:{{moduleFunctionData.backgroundColor}}">
+        <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+        <scroll-view scroll-x="true" style=" white-space: nowrap; display: flex ;flex-direction: row; enable-flex:true;background: #ffff;height:200rpx;">
+             <view class="ui-lineScrollContent {{moduleFunctionData.isShowGridLine==true?'ui-borderRight':'ui-borderNone'}}" wx:for="{{moduleFunctionData.listItem}}" wx:for-item="lineitem" wx:key="key" >
+                 <view class="ui-lineScrollContentDisplayFlex" 
+                    bindtap="goFucntionLink" 
+                    data-url="{{lineitem.linkURL}}"
+                    data-jumpType="{{lineitem.jumpType}}"
+                    data-linkJumpType="{{lineitem.linkJumpType}}" 
+                    data-appid = "{{lineitem.miniProgramAppID}}" 
+                    data-appPath = "{{lineitem.miniProgramPath}}" 
+                    data-phone="{{lineitem.phone}}"
+                    data-isNew="{{lineitem.isNew}}" 
+                    data-isHot="{{lineitem.isHot}}" 
+                    data-isOnlyEmp="{{lineitem.isOnlyEmp}}" 
+                    data-isComingSoon="{{lineitem.isComingSoon}}" 
+                    data-comingSoonText="{{lineitem.comingSoonText}}" 
+                    hover-class="bg_ccc">
+                         <view class="ui-myiconvip" wx:if="{{lineitem.isOnlyEmp}}">
+                             <image class="ui-lineScrollvipImage" src="../../images/pagelayout/vip.png" />
+                        </view>
+                         <view class="ui-myiconhot" wx:if="{{lineitem.isHot}}">
+                             <image class="ui-lineScrollhotImage" src="../../images/pagelayout/listhot.png" />
+                        </view>
+                         <view class="ui-myiconwait"  wx:if="{{lineitem.isComingSoon}}">
+                             <image class="ui-lineScrollwaitImage" src="../../images/pagelayout/comingsoon.png" />
+                         </view>
+                        <image  wx:if="{{lineitem.icon!=''&&lineitem.icon!=null&&lineitem.icon!='undefined'}}" src="{{lineitem.icon}}"  />
+                        <text class="ui-lineScrolltext">{{lineitem.title}}</text>
+                 </view>
+             </view>
+           
+        </scroll-view>
+    </view>
+    <!-- 多行 -->
+   <view class="ui-contentline top_tip"  wx:if="{{moduleFunctionData.functionType==_enumData.PageLayoutNavigateModuleFunctionTypeEnum_MultiRow}}" style="background:{{moduleFunctionData.backgroundColor}}">
+        <view class="ui-linetitle">{{moduleFunctionData.title}}</view>
+            <ui-row height="55" border-bottom hover-class="touchui-hover" wx:for="{{moduleFunctionData.listItem}}" wx:for-item="custom_list" wx:key="key" bindtap="goFucntionLink" data-url="{{custom_list.linkURL}}"
+            data-jumpType="{{custom_list.jumpType}}" data-linkJumpType="{{custom_list.linkJumpType}}"
+            data-appid = "{{custom_list.miniProgramAppID}}" data-appPath = "{{custom_list.miniProgramPath}}" data-phone="{{custom_list.phone}}"
+            data-isNew="{{custom_list.isNew}}" data-isHot="{{custom_list.isHot}}" data-isOnlyEmp="{{custom_list.isOnlyEmp}}" 
+            data-isComingSoon="{{custom_list.isComingSoon}}" data-comingSoonText="{{custom_list.comingSoonText}}"
+            style="border-bottom: 1px solid #e6e6e6;"
+            >
+                <ui-col width="44" align="center" vertical-align="middle">
+                    <view class="left_icon">
+                        <image class="left-iconImage" wx:if="{{custom_list.icon!=''&&custom_list.icon!=null&&custom_list.icon!='undefined'}}" src="{{custom_list.icon}}" />
+                    </view>
+                </ui-col>
+                <ui-col class="text" align="left" vertical-align="middle" >
+                    <view class="ui-textrow">
+                        <ui-row style="align-items:center;overflow: visible;">
+                            <ui-col align="left" vertical-align="middle" class="ui-middle" >
+                                <view class="ui-linemiddle">
+                                <text>{{custom_list.title}}</text>
+                                <image wx:if="{{custom_list.isNew}}" class="line-new" src="../../images/pagelayout/newleft.png" /> 
+                                    <image wx:if="{{custom_list.isHot}}" class="line-hot" src="../../images/pagelayout/listhot.png" />
+                                <image wx:if="{{custom_list.isOnlyEmp}}" class="line-vip" src="../../images/pagelayout/listvip.png" />
+                                <image wx:if="{{custom_list.isComingSoon}}" class="line-comingsoon" src="../../images/pagelayout/comingsoon.png" />
+                                </view>
+                            </ui-col>
+                            <ui-col align="right" width="100" vertical-align="middle" space-right="10" >
+                                <view class="ui-left" >
+                                <text class="clo-text">{{custom_list.description}}</text>
+                                <image class="ui-leftarrow" src="../../images/pagelayout/leftarrow.png"/>
+                                </view>
+                            </ui-col>
+                        </ui-row>
+                        
+                    </view>
+                </ui-col>
+            </ui-row>                 
+    </view>
+</view>
+</template>
+<script>
+const ht = require("../../js/ht.js");
+const storage = require("../../js/storage.js");
+export default {
+  properties: {
+    moduleFunctionData: {
+      type: Object,
+      value: null,
+      observer: function(newVal, oldVal, changedPath) {
+
+        if(oldVal == null) this.computerAddEmpty();
+      }
+    }
+  },
+  data: {
+
+    _emptyFunctionArray:[],
+
+
+
+    _enumData: {
+      PageLayoutNavigateModuleFunctionTypeEnum_Grid: 10,
+      PageLayoutNavigateModuleFunctionTypeEnum_SingleRow: 20,
+      PageLayoutNavigateModuleFunctionTypeEnum_MultiRow: 30,
+
+      PageLayoutNavigateModuleFunctionJumpLink_Direct: 10,
+      PageLayoutNavigateModuleFunctionJumpLink_Apploading: 20,
+      PageLayoutNavigateModuleFunctionJumpLink_Openloading: 30,
+      PageLayoutNavigateModuleFunctionJumpLink_Urltype: 110,
+      PageLayoutNavigateModuleFunctionJumpLink_Miniprogramtype: 210,
+      PageLayoutNavigateModuleFunctionJumpLink_Callphonetype: 810
+    }
+  },
+  methods: {
+    goFucntionLink(e) {
+      const url = e.currentTarget.dataset.url;
+      const jumpType = e.currentTarget.dataset.jumptype;
+      const linkjumptype = e.currentTarget.dataset.linkjumptype;
+      const appid = e.currentTarget.dataset.appid;
+      const appPath = e.currentTarget.dataset.appPath;
+      const phone = e.currentTarget.dataset.phone;
+      const isNew = e.currentTarget.dataset.isnew;
+      const isHot = e.currentTarget.dataset.ishot;
+      const isOnlyEmp = e.currentTarget.dataset.isonlyemp;
+      const isComingSoon = e.currentTarget.dataset.iscomingsoon;
+      const comingSoonText = e.currentTarget.dataset.comingsoontext;
+      const isBindEmp = storage.isBindEmp();
+      
+      if (isOnlyEmp && !isBindEmp) {
+        this.triggerEvent("eventPopupEmpRegister", {});
+        return;
+      }
+
+      if (isComingSoon) {
+          if(comingSoonText!=""){
+              wx.showToast({
+                title: comingSoonText,
+                //icon: 'success',
+                duration: 2000
+                });
+                return;
+          }
+        
+      }
+
+      if (
+        jumpType ==
+        this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Urltype
+      ) {
+        if (url == "" || url == null || url == undefined) return;
+
+        //跳转链接
+        if (
+          linkjumptype ==
+          this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Direct
+        ) {
+          ht.navigate({
+            redirectUrl: url,
+            isDirect: true
+          });
+          return;
+        } else if (
+          linkjumptype ==
+          this.data._enumData
+            .PageLayoutNavigateModuleFunctionJumpLink_Apploading
+        ) {
+          //apploading跳转
+          ht.navigate({
+            redirectUrl: url
+          });
+          return;
+        } else if (
+          linkjumptype ==
+          this.data._enumData
+            .PageLayoutNavigateModuleFunctionJumpLink_Openloading
+        ) {
+          //openloading跳转
+          wx.showToast({
+            title: "openloading跳转",
+            icon: "success",
+            duration: 2000
+          });
+          return;
+        }
+      } else if (
+        jumpType ==
+        this.data._enumData
+          .PageLayoutNavigateModuleFunctionJumpLink_Miniprogramtype
+      ) {
+        if (appPath == "" || appPath == null || appPath == undefined) return;
+
+        //跳转小程序
+        ht.navigateToMiniprogram({
+          appid: appid,
+          path: appPath,
+          success(res) {
+            // 打开成功
+          }
+        });
+        return;
+      }
+      if (
+        jumpType ==
+        this.data._enumData
+          .PageLayoutNavigateModuleFunctionJumpLink_Callphonetype
+      ) {
+        if (phone == "" || phone == null || phone == undefined) return;
+
+        //拨打电话
+        ht.navigateToCallPhone(phone);
+        return;
+      }
+    },
+    //计算要多添加的div的个数
+    computerAddEmpty(){
+
+        //一行中排列的个数
+        var showItemNumByRow =  this.data.moduleFunctionData.showItemNumByRow
+        // 实际总个数
+        var totalNumber = this.data.moduleFunctionData.listItem.length;
+        // 需要补充的空格
+        var totalNumberEmpty = (showItemNumByRow - totalNumber % showItemNumByRow) % showItemNumByRow;
+
+        var emptyArray = [];
+        
+        for(var i = 0; i < totalNumberEmpty; i++){
+            emptyArray.push(i);
+        }
+
+        this.setData({
+            _emptyFunctionArray:emptyArray,
+        })
+
+    }
+  }
+};
+</script>
+<style lang="less" scoped>
+@import "./static/styles/index.less";
+@import "./static/utils/mixins.less";
+.ui-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: content-box;
+//   padding: 16rpx;
+//   padding-top: 21rpx;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+  &.ui-full {
+    width: 100%;
+    padding: 0;
+    margin: 12rpx auto;
+  }
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    // border-bottom: 1rpx solid #f3f3f3;
+    color: #0d0e1a;
+    font-size: 30rpx;
+  }
+}
+
+
+.content {
+  .mix-flex-center();
+}
+.ui-size {
+  font-size: 100rpx;
+  color: #f99;
+}
+.btn_hover_list {
+  opacity: 0.6;
+  background-color: #333;
+}
+
+.btnitems {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+ 
+  .ui-myiconvip {
+    width: 66rpx;
+    height: 66rpx;
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    & > .ui-myiconvipImage {
+      width: 66rpx;
+      height: 66rpx;
+    }
+  }
+  .ui-myiconnew {
+    width: 56rpx;
+    height: 32rpx;
+
+    position: absolute;
+    left: 16%;
+    top: 8%;
+    & > .ui-myiconnewImage {
+      width: 56rpx;
+      height: 32rpx;
+    }
+  }
+
+  .ui-myiconhot {
+    width: 56rpx;
+    height: 32rpx;
+
+    position: absolute;
+    right: 13%;
+    top: 8%;
+    & > .ui-myiconhotImage {
+      width: 56rpx;
+      height: 32rpx;
+    }
+  }
+  .ui-myiconwait {
+    width: 92rpx;
+    height: 32rpx;
+    position: absolute;
+    right: 0;
+    top: 0;
+    & > .ui-myiconwaitImage {
+      width: 92rpx;
+      height: 32rpx;
+    }
+  }
+}
+
+.text {
+  margin-left: 20rpx;
+}
+.content-warpper {
+  display: flex;
+  height: 200rpx;
+}
+.image {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-left: 40rpx;
+  align-self: center;
+}
+.username {
+  font-size: 40rpx;
+  align-self: center;
+  margin-left: 40rpx;
+  margin-right: 40rpx;
+}
+.btn {
+  align-self: center;
+}
+
+.ui-entry {
+  display: flex;
+  background: #fff;
+  flex-wrap: wrap;
+  .ui-col {
+    align-items: center;
+  }
+  .ui-entryImage {
+    width: 48rpx;
+    height: 48rpx;
+    margin-top: 40rpx;
+    margin-bottom: 8rpx;
+  }
+  .ui-clotext {
+    margin-bottom: 40rpx;
+    color: rgb(51, 51, 51);
+    font-size: 26rpx;
+    line-height: 46rpx;
+  }
+}
+
+.left_icon {
+  text-align: center;
+  line-height: 50px;
+
+  overflow: hidden;
+  & > .left-iconImage {
+    width: 38rpx;
+    height: 38rpx;
+  }
+}
+
+.text {
+  .clo-text {
+    font-size: 16px;
+    color: #313338;
+  }
+  .ui-textrow {
+    // color: #9c9fa4;
+    // font-size: 12px;
+    width: 100%;
+    // .mix-text-overflow();
+    overflow:visible;
+  }
+}
+
+.ui-lineScroll {
+  display: flex;
+  flex-direction: column;
+  margin: 12rpx 0;
+  .ui-lineScrollContent {
+    width: 214rpx;
+    height: 200rpx;
+    display: inline-block;
+    .ui-lineScrollContentDisplayFlex {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+      //   image {
+      //     width: 48rpx;
+      //     height: 48rpx;
+      //   }
+      .ui-lineScrolltext {
+        font-size: 28rpx;
+        line-height: 48rpx;
+        color: #1a1a1a;
+      }
+      .ui-myiconvip {
+        width: 66rpx;
+        height: 66rpx;
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        & > .ui-lineScrollvipImage {
+          width: 66rpx;
+          height: 66rpx;
+        }
+      }
+      .ui-myiconhot {
+        width: 56rpx;
+        height: 32rpx;
+
+        position: absolute;
+        right: 36rpx;
+        top: 20rpx;
+        & > .ui-lineScrollhotImage {
+          width: 56rpx;
+          height: 32rpx;
+        }
+      }
+      .ui-myiconwait {
+        width: 92rpx;
+        height: 32rpx;
+        position: absolute;
+        right: 0;
+        top: 0;
+        & > .ui-lineScrollwaitImage {
+          width: 92rpx;
+          height: 32rpx;
+        }
+      }
+    }
+  }
+}
+
+.ui-borderRight:after{
+    content: " ";
+    position: absolute;
+    left: 100%;
+    top: 0;
+    right: 0;
+    height:100%;
+    border-right: 1px solid #e6e6e6;
+    color: #e6e6e6;
+    transform-origin: 0 0;
+    transform: scaleX(0.5);
+
+
+//   border-right: 1rpx solid #e6e6e6;
+}
+.ui-borderLeft:before {
+    content: " ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 100%;
+    height:100%;
+    border-right: 1px solid #e6e6e6;
+    color: #e6e6e6;
+    transform-origin: 0 0;
+    transform: scaleX(0.5);
+    border-left: 1rpx solid #e6e6e6;
+}
+.ui-borderNone {
+  border: none;
+}
+.ui-bordertop:before{
+content: " ";
+position: absolute;
+left: 0;
+top: 0;
+right: 0;
+height: 1px;
+border-top: 1px solid #e6e6e6;
+color: #e6e6e6;
+transform-origin: 0 0;
+transform: scaleY(0.5);
+
+}
+
+.bg_ccc {
+  background: #ccc;
+}
+.ui-row-border-bottom:after {
+  border-bottom: 0px solid #e6e6e6;
+}
+.ui-lineScroll {
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    border-bottom: 1rpx solid #e6e6e6;
+  }
+}
+.ui-contentline {
+  margin: 24rpx 16rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    border-bottom: 1rpx solid #e6e6e6;
+  }
+  .text {
+    margin: 0;
+    // border-bottom: 1px solid #e6e6e6;
+    // view {
+    //   overflow: visible;
+    // }
+    .line-vip {
+      width: 52rpx;
+      height: 30rpx;
+    }
+    .ui-linemiddle {
+      display: flex;
+      align-items: center;
+      overflow:visible;
+
+      .line-vip {
+        margin-left: 20rpx;
+      }
+    }
+    .line-hot {
+      width: 48rpx;
+      height: 28rpx;
+      margin-left: 14rpx;
+      position: relative;
+      top: -28rpx;
+    }
+    .line-new {
+      width: 48rpx;
+      height: 28rpx;
+      margin-left: 14rpx;
+      position: relative;
+      top: -28rpx;
+    }
+    .line-comingsoon {
+      width: 92rpx;
+      height: 32rpx;
+      margin-left: 20rpx;
+    }
+  }
+  .ui-leftarrow {
+    width: 20rpx;
+    height: 20rpx;
+    margin-left: 16rpx;
+  }
+  .ui-left {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    .clo-text {
+      color: #999999;
+    }
+  }
+}
+</style>

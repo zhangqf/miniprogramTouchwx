@@ -1,0 +1,143 @@
+<template>
+  <view class="ui-content" style="padding:24rpx 0; ">
+      <swiper class="swiper" current="0" indicator-color="rgba(51, 51, 51, 0.3)" indicator-active-color="#ff2a00"   
+      autoplay=true interval="{{_bannerData.interval}}" autoHeight=true style="height:{{_bannerHeight}}px"
+      circular=true easing-function="easeInOutCubic">
+          <swiper-item wx:for="{{_bannerData.pages}}" wx:for-item="bannerPageItem" wx:key="bannerPage">
+              <view class="swiper_item" bindtap="goBannerLink" data-url="{{bannerPageItem.url}}">
+                  <image data-id='{{index}}'  src="{{bannerPageItem.imageURL}}" mode='widthFix'/>
+                  <view class="ht-bannerTitle">{{bannerPageItem.title}}</view>
+              </view>
+          </swiper-item>
+      </swiper>
+  </view>
+                                 
+</template>
+<script>
+const ht = require("../../js/ht.js");
+export default {
+  properties: {
+    loading: {
+      type: Boolean,
+      value: false,
+      observer: function(newVal, oldVal, changedPath) {
+        this.initBanner();
+      }
+    },
+    bannerName: {
+      type: String,
+      value: "",
+      observer: function(newVal, oldVal, changedPath) {
+        this.initBanner();
+      }
+    }
+  },
+  data: {
+    _bannerData: {},
+    _bannerHeight: 0
+  },
+  methods: {
+    initBanner: function() {
+      var pageMain = this;
+
+      if (!pageMain.data.loading) return;
+      if (pageMain.data.bannerName == "") return;
+
+      ht.setForm({
+        url: "/banner/GetBannerByNameAsync",
+        data: {
+          value: pageMain.data.bannerName
+        },
+        success: function(data) {
+          pageMain.setData({
+            _bannerData: data
+          });
+
+          var sysInfo = wx.getSystemInfoSync();
+          var screenWidth = sysInfo.screenWidth;
+          wx.getImageInfo({
+            //获取图片长宽等信息
+            src: data.pages[0].imageURL,
+            success: function(res) {
+              var imgw = res.width;
+              var imgh = res.height;
+              var bannerHeight = screenWidth * imgh / imgw;
+
+              pageMain.setData({
+                _bannerHeight: bannerHeight
+              });
+            }
+          });
+        }
+      });
+    },
+    goBannerLink: function(e) {
+      const url = e.currentTarget.dataset.url;
+      if (url != "" && url != null && url != undefined) {
+        ht.navigate({
+          redirectUrl: url,
+          isDirect: true
+        });
+      }
+    }
+  },
+  lifetimes: {
+    attached: function() {
+      // 在组件实例进入页面节点树时执行
+    }
+  }
+};
+</script>
+<style lang="less" scoped>
+.ui-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: content-box;
+//   padding: 16rpx;
+//   padding-top: 21rpx;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+  color: #333;
+}
+
+.swiper {
+  margin-bottom: 24rpx;
+  //   height: 240rpx;
+  .swiper_item {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10rpx;
+    margin-bottom: 24rpx;
+    overflow: hidden;
+    position: relative;
+    image {
+      flex: 1;
+      margin-right: 5px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    .ht-bannerTitle {
+      position: absolute;
+      bottom: 0rpx;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      background: rgba(233, 233, 233, 0.6);
+      text-align: center;
+      height: 40rpx;
+      line-height: 40rpx;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+.text {
+  margin-left: 20rpx;
+}
+</style>

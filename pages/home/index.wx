@@ -1,0 +1,299 @@
+<template>
+  <view class="page">
+    <view class="content-warpper">
+      <image src="{{_userInfo.avatarUrl}}" mode="aspectFill" class="image" />
+      <view class="username">{{_userInfo.nickName}}</view>
+      <button
+        size="mini"
+        class="btn"
+        open-type="getUserInfo"
+        bindgetuserinfo="bindGetUserInfo"
+        wx:if="{{_canIUse&&_isShowButtonGetUserInfo}}"
+      >获取用户信息</button>
+      <button
+        size="mini"
+        class="btn"
+        open-type="getPhoneNumber"
+        bindgetphonenumber="bindGetPhoneNumber"
+        wx:if="{{!_isShowButtonGetUserInfo&&_isShowButtonGetPhone}}"
+      >获取手机号</button>
+    </view>
+    <view>
+      <ui-row border-top border-bottom height="40" space-bottom="20">
+        <ui-col border-right align="center" vertical-align="middle">金额</ui-col>
+        <ui-col border-right align="center" vertical-align="middle">积分</ui-col>
+        <ui-col align="center" vertical-align="middle">优惠劵</ui-col>
+      </ui-row>
+    </view>
+    <view>
+      <text class="text">服务项目</text>
+      <ui-row border-top border-bottom height="100">
+        <ui-col border-right align="center" vertical-align="middle">
+          <view bindtap="navigateToBuyTicket" hover-class="navigator-hover" class="btnitems">
+            <span class="ui-icons icon-xinyongqia ui-size"></span>
+            <text>购票</text>
+          </view>
+        </ui-col>
+        <ui-col border-right align="center" vertical-align="middle">
+          <navigator url="/pages/addpage/addpage" hover-class="navigator-hover" class="btnitems">
+            <span class="ui-icons icon-1 ui-size"></span>
+            <text>样例</text>
+          </navigator>
+        </ui-col>
+        <ui-col align="center" vertical-align="middle">
+          <view url="/pages/items/items" hover-class="navigator-hover" class="btnitems" bindtap="callphone">
+            <span class="ui-icons icon-shoujichongzhi ui-size"></span>
+            <text>拨打电话</text>
+            <!-- <button bindtap="callphone">拨号</button> -->
+          </view>
+        </ui-col>
+      </ui-row>
+      <ui-row>
+      <ui-col border-right align="center" vertical-align="middle">
+          <navigator url="/pages/minitest/minitest" hover-class="navigator-hover" class="btnitems">
+            <span class="ui-icons icon-1 ui-size"></span>
+            <text>测试</text>
+          </navigator>
+        </ui-col>
+        </ui-row>
+    </view>
+  </view>
+</template>
+
+<script>
+const app = getApp();
+
+const storage = require("../../js/storage.js");
+const ht = require("../../js/ht.js");
+const config = require("../../js/config.js");
+console.log(app);
+export default {
+  config: {
+    navigationBarTitleText: "首页",
+    backgroundColor: "#F4F4F4",
+    navigationBarTextStyle: "black"
+  },
+  data: {
+    _canIUse: wx.canIUse("button.open-type.getUserInfo"),
+    _isShowButtonGetUserInfo: false,
+    _isShowButtonGetPhone: false,
+    _userInfo: {}
+  },
+
+  navigateToBuyTicket: function(e) {
+    ht.navigate({
+      redirectUrl: "/AppTicket/Ticket/BuyTicket"
+    });
+  },
+  // 获取用户信息
+  bindGetUserInfo: function(e) {
+    if (e.detail.errMsg == "getUserInfo:ok") {
+      // 授权成功
+
+      this.setData({
+        _userInfo: {
+          avatarUrl: e.detail.userInfo.avatarUrl,
+          nickName: e.detail.userInfo.nickName
+        },
+        _isShowButtonGetUserInfo: false
+      });
+
+      ht.updateUserInfo({
+        EncryptedData: e.detail.encryptedData,
+        IV: e.detail.iv,
+
+        IsGetEmpPoint: true,
+        IsGetCouponNum: true,
+
+        success: function(res) {
+          console.log("用户信息获取成功");
+          console.log(res);
+        }
+      });
+    } else {
+      // 授权失败
+      console.log("未登录");
+    }
+  },
+
+    //   拨号
+    callphone(){
+        wx.showActionSheet({
+            itemList:["18393526324"],
+            success:function(res){
+                console.log(res)
+                wx.makePhoneCall({
+                    phoneNumber:'18393526324',
+                    success:function(){
+                        console.log("拨打电话成功！")
+                    },
+                    fail:function(){
+                        console.log("拨打电话失败！")
+                    }
+                })
+                if(!res.cancel){
+                    console.log(res.tapIndex)
+                }
+            }
+        })
+    },
+
+
+  // 获取电话号码
+  bindGetPhoneNumber: function(e) {
+    var pageMain = this;
+
+    ht.registerEmp({
+      EncryptedData: e.detail.encryptedData,
+      IV: e.detail.iv,
+
+      IsGetEmpPoint: true,
+      IsGetCouponNum: true,
+
+      success: function(data) {
+        console.log("用户信息获取成功");
+        console.log(data);
+
+        pageMain.setData({
+          _isShowButtonGetPhone: false
+        });
+      }
+    });
+  },
+
+  onLoad() {
+    var pageMain = this;
+
+    pageMain.setData({
+      _userInfo: { avatarUrl: "../../images/mm.jpg", nickName: "游客" }
+    });
+
+    // 登录
+    ht.login({
+      aleardyLogin() {
+        // 显示会员信息
+        ht.getEmpInfo({
+          IsGetEmpPoint: true,
+          IsGetCouponNum: true,
+          success(data) {
+            console.log(data);
+            console.log(11111)
+            if (data.avatarUrl) {
+              pageMain.setData({
+                _userInfo: {
+                  avatarUrl: data.avatarUrl,
+                  nickName: data.empAlias
+                }
+              });
+            } else {
+              // 显示个人信息
+              ht.getUserInfo({
+                success(data) {
+                  console.log(data);
+
+                  pageMain.setData({
+                    _userInfo: {
+                      avatarUrl: data.userInfo.avatarUrl,
+                      nickName: data.userInfo.nickName
+                    }
+                  });
+                },
+                fail() {
+                  pageMain.setData({
+                    _isShowButtonGetUserInfo: true
+                  });
+                }
+              });
+            }
+
+            if (!data.isBindEmp) {
+              pageMain.setData({
+                _isShowButtonGetPhone: true
+              });
+            }
+
+            //-- 显示会员信息
+          },
+          fail() {
+              console.log("fail")
+            pageMain.setData({
+              _isShowButtonGetUserInfo: true,
+              _isShowButtonGetPhone: true
+            });
+          }
+        });
+      },
+      loginSuccess(data) {
+        if (data.avatarUrl) {
+          pageMain.setData({
+            _userInfo: { avatarUrl: data.avatarUrl, nickName: data.empAlias }
+          });
+        } else {
+          pageMain.setData({
+            _isShowButtonGetUserInfo: true
+          });
+        }
+
+        if (!data.isBindEmp) {
+          pageMain.setData({
+            _isShowButtonGetPhone: true
+          });
+        }
+      },
+      loginFail() {
+        console.log("登录失败");
+        pageMain.setData({
+          _isShowButtonGetUserInfo: true,
+          _isShowButtonGetPhone: true
+        });
+      }
+    });
+  },
+
+  onShow(options) {
+    console.log(storage.getCookie());
+  }
+};
+</script>
+
+<style lang="less">
+.content {
+  .mix-flex-center();
+}
+.ui-size {
+  font-size: 100rpx;
+  color: #f99;
+}
+
+.btnitems {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.text {
+  margin-left: 20rpx;
+}
+.content-warpper {
+  display: flex;
+  height: 200rpx;
+}
+.image {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-left: 40rpx;
+  align-self: center;
+}
+.username {
+  font-size: 40rpx;
+  align-self: center;
+  margin-left: 40rpx;
+  margin-right: 40rpx;
+}
+.btn {
+  align-self: center;
+}
+</style>
+

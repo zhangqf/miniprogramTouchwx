@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/tools/pagelayout/pagelayout",
+    "pages/tools/scancode/scancode",
+    "pages/tools/webview/webview"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#efefef",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "TouchUI",
+    "navigationBarTextStyle": "black"
+  },
+  "networkTimeout": {
+    "request": 30000
+  },
+  "theme": {
+    "theme-color": "#39f"
+  }
+}

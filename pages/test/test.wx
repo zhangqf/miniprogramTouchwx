@@ -1,0 +1,42 @@
+<template>
+  <view>
+
+                <view  wx:for="{{_data}}" wx:for-item="item" wx:key="module" >
+<text class="person-emName">{{item.name}}</text>
+<text class="person-emName">{{item.displayName}}</text>
+  </view>
+<button bindtap="addevent">add</button>
+<button bindtap="modifyevent">modify</button>
+  </view>
+</template>
+
+<script>
+export default {
+  config: {
+    navigationBarTitleText: "test"
+  },
+  data: {
+    _data: []
+  },
+  addevent: function() {
+    var list = this.data._data;
+    list.push({ name: "1231", displayName: "455" });
+
+    this.setData({
+      _data: list
+    });
+  },
+  modifyevent: function() {
+    var list = this.data._data;
+    var data = list[0];
+    data.name = "34234234";
+
+    this.setData({
+      _data: list
+    });
+  }
+};
+</script>
+
+<style lang="less">
+</style>

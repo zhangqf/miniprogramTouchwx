@@ -1,0 +1,73 @@
+<template>
+   <view class="wx-content">
+    <import src="../../plugin/wxParse/wxParse.wxml"/>
+     
+      <template is="wxParse" data="{{wxParseData:bindData.contentData.nodes}}"></template>
+                                 
+  </view>
+</template>
+<script>
+const ht = require("../../js/ht.js");
+const WxParse = require("../../plugin/wxParse/wxParse.js");
+const config = require("../../js/config.js");
+export default {
+    properties: {
+    loading: {
+      type: Boolean,
+      value: false,
+      observer: function(newVal, oldVal, changedPath) {
+        
+        this.initContent();
+      }
+    },
+     contentName: {
+      type: String,
+      value: "",
+      observer: function(newVal, oldVal, changedPath) {
+                
+        this.initContent();
+      }
+    }
+
+  },
+  data: {
+  },
+  methods: {
+   initContent(){
+       var pageMain = this;
+       if(!pageMain.data.loading)return;
+       if(pageMain.data.contentName=="")return;
+       ht.promiseSetForm({
+        url: "/content/GetEntityByNameAsync",
+        data: {
+            value: pageMain.data.contentName
+        },
+        success: function(data) {
+            WxParse.wxParse(
+            "contentData",
+            "html",
+            data.showText,
+            pageMain,
+            0,
+            config.imageRootPath
+            );
+        },
+        fail: function(data) {}
+        });
+   }
+  },
+   lifetimes: {
+    attached: function() {
+     
+   }
+   }
+}
+</script>
+<style lang="less" scoped>
+@import "./plugin/wxParse/wxParse.wxss";
+ .wx-content{
+     width:96%;
+     height:auto;
+     margin:0 auto;
+ }
+</style>

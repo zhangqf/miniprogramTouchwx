@@ -1,0 +1,119 @@
+<template>
+  <view class="ui-contentwarpper">
+    <view class="ui-margin" >{{_payStatusText}}</view>
+  </view>
+</template>
+
+<script>
+const ht = require("../../js/ht.js");
+export default {
+  config: {
+    navigationBarTitleText: ""
+  },
+  data: {
+    _payStatusText: "支付中..."
+  },
+  onLoad(options) {
+    //-- 传入的跳转链接为转码后的链接，需解码
+    var recordNo = options.RecordNo;
+    var okURL = decodeURIComponent(options.OKURL);
+    var errorURL = decodeURIComponent(options.ErrorURL);
+
+    var pageMain = this;
+
+    ht.setForm({
+      url: "/weixinPayData/PrePayAsync",
+      data: { value: recordNo },
+      success: function(res) {
+        wx.requestPayment({
+          timeStamp: res.timestamp,
+          nonceStr: res.nonceStr,
+          package: res.package,
+          signType: res.signType,
+          paySign: res.paySign,
+          success(res) {
+            pageMain.CheckPayAsync(recordNo, okURL);
+          },
+          fail(res) {
+            pageMain.setData({
+              _payStatusText: "支付失败"
+            });
+
+            pageMain.CancelPayAsync(recordNo);
+
+            ht.navigate({
+              redirectUrl: errorURL,
+              isDirect: true,
+              isHasBack: false
+            });
+          },
+          complete() {
+            console.log("支付完成！");
+          }
+        });
+      }
+    });
+  },
+
+  CheckPayAsync: function(recordNo, okURL) {
+    var pageMain = this;
+    ht.setForm({
+      url: "/weixinPayData/CheckPayAsync",
+      data: {
+        value: recordNo
+      },
+      success: function() {
+        pageMain.setData({
+          _payStatusText: "订单处理中..."
+        });
+
+        var timer = setInterval(function() {
+          ht.setForm({
+            url: "/weixinBill/CheckBillSuccessAsync",
+            data: {
+              value: recordNo
+            },
+            success: function(data) {
+              if (data && data.value) {
+                pageMain.setData({
+                  _payStatusText: "支付成功"
+                });
+
+                clearInterval(timer);
+
+                setTimeout(() => {
+                  ht.navigate({
+                    redirectUrl: okURL,
+                    isDirect: true,
+                    isHasBack: false
+                  });
+                }, 500);
+              }
+            }
+          });
+        }, 1000);
+      }
+    });
+  },
+
+  CancelPayAsync: function(recordNo) {
+    ht.setForm({
+      url: "/weixinPayData/CancelPayAsync",
+      data: {
+        value: recordNo
+      }
+    });
+  }
+};
+</script>
+
+<style lang="less">
+.ui-contentwarpper {
+  overflow: hidden;
+}
+.ui-margin {
+  text-align: center;
+  font-size: 50rpx;
+  margin-top: 100rpx;
+}
+</style>

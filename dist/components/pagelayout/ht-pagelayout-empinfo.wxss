@@ -1,0 +1,157 @@
+.ui-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: content-box;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+.personal {
+  background: #fff;
+  height: 350rpx;
+  border-radius: 20rpx;
+  display: flex;
+  background: #006eb3;
+  color: #fff;
+  flex-direction: column;
+  padding-left: 24rpx;
+  position: relative;
+  overflow: hidden;
+}
+.personal .image {
+  width: 100rpx;
+  height: 100rpx;
+  margin: 0;
+  margin-right: 24rpx;
+  border-radius: 50%;
+}
+.personal .ui-text {
+  margin-top: 138rpx;
+  font-size: 32rpx;
+}
+.personal .personal-title {
+  display: flex;
+  margin-top: 32rpx;
+  align-items: center;
+  position: relative;
+}
+.personal .personal-title .ui-secondRow {
+  margin-top: 16rpx;
+}
+.personal .personal-title .person-emName {
+  font-size: 32rpx;
+  margin-bottom: 56rpx;
+  z-index: 11;
+  vertical-align: middle;
+}
+.personal .personal-title .person-secondRow {
+  font-size: 24rpx;
+  line-height: 34rpx;
+  margin-right: 8rpx;
+  border-radius: 15rpx;
+  padding: 0rpx 12rpx;
+  background: rgba(0, 0, 0, 0.1);
+}
+.personal .personal-title .person-empLevel {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 20rpx;
+  line-height: 34rpx;
+  color: #804d1a;
+  padding: 0 8rpx;
+  height: 36rpx;
+  border-radius: 18rpx;
+  background-image: linear-gradient(90deg, #e6d3ae 0%, #c7a676 100%);
+  text-align: center;
+  margin-left: 16rpx;
+}
+.personal .personal-title .person-qrcode {
+  width: 44rpx;
+  height: 46rpx;
+  position: absolute;
+  top: 20rpx;
+  right: 46rpx;
+}
+.personal .ui-personalitems {
+  position: absolute;
+  height: 120rpx;
+  right: 22rpx;
+  bottom: 38rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.personal .ui-personalitems .ui-personalitem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 176rpx;
+  height: 40rpx;
+  border-radius: 40rpx;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 20rpx;
+  margin-top: 10rpx;
+  color: #fff;
+  text-align: center;
+}
+.personal .ui-personalitems .ui-personalitem .ui-tipimg {
+  width: 0.58rem;
+  height: 0.58rem;
+  margin-right: 20rpx;
+}
+.emp-item {
+  display: flex;
+  align-items: center;
+  height: 150rpx;
+  margin-top: 24rpx;
+  overflow: hidden;
+}
+.emp-item > view {
+  flex: 1;
+  text-align: center;
+}
+.emp-item .ui-empitems {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.emp-item .ui-empitems .ui-empitemsNo {
+  font-size: 32rpx;
+  color: #000;
+}
+.emp-item .ui-empitems .ui-empitemstitle {
+  font-size: 26rpx;
+  color: #666;
+  margin-top: 22rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.emp-item .ui-empitems .ui-empitemstitle image {
+  width: 26rpx;
+  height: 26rpx;
+  margin-right: 10rpx;
+}
+.ui-button {
+  width: 300rpx;
+  height: 70rpx;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  bottom: 60rpx;
+  border-radius: 40rpx;
+  overflow: hidden;
+}
+.ui-button button {
+  position: static;
+  width: 300rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  margin: 0;
+}
+.ui-button button::after {
+  display: none;
+}

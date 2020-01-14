@@ -1,0 +1,126 @@
+/* 1像素解决方案 */
+/*
+ * 清除1px
+ */
+/*
+ * 清除浮动
+ */
+/*
+ * mobile
+ */
+/*
+ * 1px
+ */
+/*
+ * text
+ */
+/* 垂直居中 */
+/* 水平居中 */
+/* 水平垂直居中 */
+/* 超出部分出省略号 */
+/* 多行文本超出部分省略号 */
+/* 1像素解决方案 */
+/*
+ * 清除1px
+ */
+/*
+ * 清除浮动
+ */
+/*
+ * mobile
+ */
+/*
+ * 1px
+ */
+/*
+ * text
+ */
+/* 垂直居中 */
+/* 水平居中 */
+/* 水平垂直居中 */
+/* 超出部分出省略号 */
+/* 多行文本超出部分省略号 */
+.ui-popup .ui-popup-content {
+  bottom: 36%;
+}
+.preventScroll {
+  overflow: hidden;
+}
+.popupEmpRegisterTitle {
+  text-align: center;
+  color: #000;
+  font-size: 18px;
+  margin-top: 60rpx;
+}
+.popupEmpRegister {
+  width: 90%;
+  background-color: #fff;
+  height: 220px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  bottom: 36%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 92%;
+}
+.popupEmpRegister .title {
+  line-height: 30px;
+  font-size: 18px;
+  padding: 10px 20px 0;
+}
+.ui-popup-content.bottom {
+  bottom: 36%;
+}
+.ui-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: content-box;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+page {
+  background: #f7f7f7;
+  display: flex;
+}
+.navigate {
+  width: 100%;
+  padding: 12rpx;
+}
+.ui-picImage {
+  width: 100%;
+}
+.fixed-view-content {
+  padding: 0 0;
+  height: 98rpx;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  color: #fff;
+  background-color: #ccc;
+  z-index: 99;
+}
+.fixed-view-content .fixed-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.fixed-view-content .tarimg {
+  width: 44rpx;
+  height: 44rpx;
+  margin-bottom: 8rpx;
+  margin-top: 7rpx;
+}
+.fixed-view-content .displayname {
+  font-size: 22rpx;
+  color: #000;
+}
+.ui-fixed-view {
+  position: static;
+}

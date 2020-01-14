@@ -1,0 +1,10 @@
+<view class="ui-content" style="padding:24rpx 0; ">
+  <swiper class="swiper" current="0" indicator-color="rgba(51, 51, 51, 0.3)" indicator-active-color="#ff2a00" autoplay="true" interval="{{_bannerData.interval}}" autoHeight="true" style="height:{{_bannerHeight}}px" circular="true" easing-function="easeInOutCubic">
+    <swiper-item wx:for="{{_bannerData.pages}}" wx:for-item="bannerPageItem" wx:key="bannerPage">
+      <view class="swiper_item" bindtap="goBannerLink" data-url="{{bannerPageItem.url}}">
+        <image data-id="{{index}}" src="{{bannerPageItem.imageURL}}" mode="widthFix" />
+        <view class="ht-bannerTitle">{{bannerPageItem.title}}</view>
+      </view>
+    </swiper-item>
+  </swiper>
+</view>

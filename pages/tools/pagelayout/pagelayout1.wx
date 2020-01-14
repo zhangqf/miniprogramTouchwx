@@ -1,0 +1,1494 @@
+
+
+<template>
+
+    <view>
+         <view wx:if="{{_ShowEmpSubscribeImage}}" bindtap="cancelShowEmpSubscribeImage" style="position:absolute;background:rgba(33,33,33,.4);width:100%;height:100%; z-index:11;top:0;left:0">
+            <image src="{{_empInfo.subscribeImageURL}}"  style="position: flex;left: 0;right: 0;margin:15% auto;top: 13%;height:667rpx;width:680rpx;" />
+        </view>
+<import src="../../plugin/wxParse/wxParse.wxml"/>
+        <view class="navigate" wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateItem" wx:for-index="navigateIndex" wx:key="navigate">
+            <view  style="position:relative; overflow:auto;" wx:if="{{navigateIndex==_activeNavigateIndex}}" >
+
+                <view  wx:for="{{navigateItem.listModule}}" wx:for-item="moduleItem"  wx:for-index="moduleIndex" wx:key="module" >
+                    
+                    <!-- 会员卡 -->
+                            <block  >
+                                <view class="ui-content" wx:if="{{moduleItem.moduleEmpData}}" style="margin-bottom:24rpx;position:relative;">
+                                    <view class="personal" style="background-image:url({{_empInfo.EmpLevelImageURL!=null?_empInfo.EmpLevelImageURL:_empInfo.ImageURL}});background-repeat: no-repeat;background-size:100%" >
+                                        <block wx:if="{{_empStatusRegister}}">
+                                            <view class="personal-title">
+                                                <image class="image" data-url="{{moduleItem.moduleEmpData.clickLogoJumpURL}}" bindtap="clickEmpLogo"  src="{{_empInfo.avatarUrl==null?_empInfo.logo:_empInfo.avatarUrl}}"/>
+                                                <view class="ui-radius">
+                                                    <text class="person-emName">{{_empInfo.empAlias}}</text>
+                                                    <view wx:if="{{moduleItem.moduleEmpData.isShowEmpLevel}}" class="gold-membership-card">{{_empInfo.empLevelDisplayName}}</view>
+                                                    <view class="ui-phoneitems">
+                                                        <text class="person-phoneNum" wx:if="{{moduleItem.moduleEmpData.isShowEmpEndDay}}">{{_empInfo.endDay}}</text>
+                                                        <text class="person-phoneNum" wx:if="{{moduleItem.moduleEmpData.isShowPhone && _empInfo.phone}}">{{moduleItem.moduleEmpData.isShowPhoneFilter==false?_empInfo.phone:_empInfo.phoneFilter}}</text>
+                                                    </view>
+                                                </view>
+                                                <image wx:if="{{moduleItem.moduleEmpData.isShowEmpQRCode}}" bindtap="linkToEmpQRcode" class="person-qrcode" src="../../images/QRcode.png"/>
+                                            </view>
+                                            <view class="ui-text" style="color:{{moduleItem.moduleEmpData.empNameColor}}" wx:if="{{moduleItem.moduleEmpData.isShowEmpName}}">{{_empInfo.empName}}</view>
+                                            <view class="ui-personalitems">
+                                                <view wx:if="{{moduleItem.moduleEmpData.isShowPerfectEmpInfo && _empInfo.isShowPerfectEmpInfo}}" 
+                                                bindtap="linkToPerfectEmp" class="ui-personalitem">
+                                                    <image class="ui-tipimg person-perfectinformation" src="../../images/perfectinformation.png"/>完善资料</view>
+                                                <view wx:if="{{moduleItem.moduleEmpData.isShowSignIn && _empInfo.isShowSignIn}}" 
+                                                bindtap="linkToEmpSignIn" class="ui-personalitem">
+                                                    <image class="ui-tipimg person-signin" src="../../images/signin.png"/>签到有礼</view>
+                                                <view wx:if="{{moduleItem.moduleEmpData.isShowWeixinEmpSubscribe && _empInfo.isShowWeixinEmpSubscribe}}"
+                                                bindtap="linkToEmpSubscribe" class="ui-personalitem">
+                                                    <image class="ui-tipimg person-membernotification" src="../../images/membernotification.png"/>开启通知</view>
+                                            </view>
+                                          
+                                        </block>
+                                        <block wx:else>
+                                            <view class="personal-title">
+                                                <image class="image"  src="{{_empInfo.avatarUrl==''?_empInfo.Logo:_empInfo.avatarUrl}}"/>
+                                                <view class="ui-radius">
+                                                    <text class="person-emName">{{_empInfo.empAlias!=''?_empInfo.empAlias:_empInfo.title}}</text>
+                                                </view>
+                                            </view>
+                                              <view class="ui-button"  wx:if="{{_canIUse&&!_empStatusGrant}}">
+                                                    <button  open-type="getUserInfo" lang="zh_CN" bindgetuserinfo="grantUserInfo">授权登录</button>
+                                              </view>
+                                                <view class="ui-button"  wx:if="{{_empStatusGrant}}">
+                                                    <button open-type="getPhoneNumber"  lang="zh_CN" bindgetphonenumber="registerEmp">开通会员</button>
+                                              </view>
+                                        </block>
+                                        
+                                    </view>
+                                    <view class="emp-item">
+                                        <view  wx:for="{{moduleItem.moduleEmpData.listItem}}" wx:for-item="empitem" wx:for-index="empIndex" wx:key="key" wx:if="{{empIndex<=3}}">
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Balance}}">
+                                                <view class="ui-empitemsNo">{{_empInfo.empMoney==null?"-":_empInfo.empMoney}}</view>
+                                                <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>储值</view>
+                                            </view>
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Point}}">
+                                                  <view class="ui-empitemsNo">{{_empInfo.empPoint==null?"-":_empInfo.empPoint}}</view>
+                                              <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>积分</view>
+                                            </view>
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Growth}}">
+                                                <view class="ui-empitemsNo">{{_empInfo.empGrowth==null?"-":_empInfo.empGrowth}}</view>
+                                                <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>成长值</view>
+                                            </view>
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_EmpLevel}}">
+                                                <view class="ui-empitemsNo">{{_empInfo.empLevelDisplayName==null?"-":_empInfo.empLevelDisplayName}}</view>
+                                                <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>等级</view>
+                                            </view>
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum}}">
+                                                <view class="ui-empitemsNo">{{_empInfo.couponNum==null?"-":_empInfo.couponNum}}</view>
+                                                <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>优惠券</view>
+                                            </view>
+                                            <view class="ui-empitems" wx:if="{{empitem.itemType==_enumData.PageLayoutNavigateModuleEmpItemTypeEnum_Custom}}">
+                                                <view class="ui-empitemsNo">{{empitem.customValue}}</view>
+                                                <view class="ui-empitemstitle"><image wx:if="{{empitem.icon!=''&&empitem.icon!='undefined'&&empitem.icon!=null}}" src="{{empitem.icon}}" alt/>{{empitem.title}}</view>
+                                            </view>
+                                        </view>
+                                    </view>
+                                    
+                                </view>
+                            </block>
+                    <!-- 轮播图 -->
+                            <block wx:if="{{moduleItem.moduleBannerData}}">
+                                <view class="ui-content" style="padding:24rpx 0; ">
+                                    <swiper class="three_swiper" current="0" indicator-color="rgba(51, 51, 51, 0.3)" indicator-active-color="#ff2a00"   
+                                    autoplay=true interval="{{moduleItem.moduleData.interval}}" autoHeight=true style="height:{{moduleItem.moduleData.bannerHeight}}px"
+                                    circular=true easing-function="easeInOutCubic">
+                                        <swiper-item wx:for="{{moduleItem.moduleData.pages}}" wx:for-item="bannerPageItem" wx:key="bannerPage">
+                                            <view class="swiper_item" bindtap="goBannerLink" data-url="{{bannerPageItem.url}}">
+                                                <image data-id='{{index}}'  src="{{bannerPageItem.imageURL}}" mode='widthFix'/>
+                                                <view class="ht-bannerTitle">{{bannerPageItem.title}}</view>
+                                            </view>
+                                        </swiper-item>
+                                    </swiper>
+                                </view>
+                            </block>
+                        <!-- 图文 -->
+                            <block wx:if="{{moduleItem.moduleContentData}}">
+                                <view class="ui-content ui-imageContent" >
+                                  
+                                <!-- //这里data中article为bindName -->
+                                <template is="wxParse" data="{{wxParseData:[moduleItem.moduleContentData.ContentName].nodes}}"></template>
+                                </view>
+                            </block>
+                        <!-- 图片 -->
+                            <block wx:if="{{moduleItem.moduleImageData}}">
+                                <view class="ui-content">
+                                  <image class="ui-picImage" mode="widthFix" src="{{moduleItem.moduleImageData.imageURL}}" lazy-load=true show-menu-by-longpress=true data-url="{{moduleItem.moduleImageData.linkURL}}"
+                                  data-linkJumpType="{{moduleItem.moduleImageData.linkJumpType}}" bindtap="goImageLink"/>
+                                </view>
+                            </block>
+                    <!-- 功能项 -->
+                            <block wx:if="{{moduleItem.moduleFunctionData}}">
+                                <!-- 九宫格 -->
+                               
+                               
+
+                                <view class="ui-content ui-full" wx:if="{{moduleItem.moduleFunctionData.functionType==10}}" style="background:{{moduleItem.moduleFunctionData.backgroundColor}}">
+                                    <view class="ui-linetitle">{{moduleItem.moduleFunctionData.title}}</view>
+                                   <view  wx:for="{{moduleItem.moduleFunctionData.listItem}}" wx:for-item="functionItem" wx:for-index="functionIndex" wx:key="key">
+                                 
+                        <ui-row class="ui-entry" wx:if="{{functionIndex % moduleItem.moduleFunctionData.showItemNumByRow == 0}}" border-top style="background:{{moduleItem.moduleFunctionData.backgroundColor}};justify-content:initial">
+                        <ui-col wx:for="{{moduleItem.moduleFunctionData.listItem}}" 
+                        wx:for-item="functionColItem" 
+                        wx:for-index="functionColIndex"  
+                        wx:key="key"
+                        wx:if="{{functionColIndex >= functionIndex && functionColIndex < functionIndex + moduleItem.moduleFunctionData.showItemNumByRow}}" 
+                        vertical-align="middle"
+                        class="ui-col {{(functionColIndex+1)%moduleItem.moduleFunctionData.showItemNumByRow!=0?'ui-borderRight':'ui-borderNone'}}" 
+                        style="width:{{(718-moduleItem.moduleFunctionData.showItemNumByRow-1)/moduleItem.moduleFunctionData.showItemNumByRow}}rpx;flex:none"> 
+                            <view bindtap="goFucntionLink" hover-class="navigator-hover" class="btnitems"  
+                                            data-jumpType="{{functionColItem.jumpType}}"
+                                            data-linkJumpType="{{functionColItem.linkJumpType}}"  data-url="{{functionColItem.linkURL}}" 
+                                            data-miniProgramAppID ="{{functionColItem.miniProgramAppID}}" data-miniProgramPath ="{{functionColItem.miniProgramPath}}" 
+                                            data-phone="{{functionColItem.phone}}" 
+                                            data-isNew="{{functionColItem.isNew}}" data-isHot="{{functionColItem.isHot}}" data-isOnlyEmp="{{functionColItem.isOnlyEmp}}" 
+                                            data-isComingSoon="{{functionColItem.isComingSoon}}" data-comingSoonText="{{functionColItem.comingSoonText}}" >
+                                                <!-- <span class="ui-icons icon-xinyongqia ui-size"></span> -->
+                                                <view wx:if="{{functionColItem.isOnlyEmp}}" class="ui-myiconvip"><image src="../../images/vip.png" /></view>
+                                                <view wx:if="{{functionColItem.isHot}}" class="ui-myiconhot" ><image src="../../images/listhot.png" /></view>
+                                                <view wx:if="{{functionColItem.isComingSoon}}" class="ui-myiconwait">
+                                                    <image src="../../images/comingsoon.png" />
+                                                </view>
+                                                    <view wx:if="{{functionColItem.isNew}}" class="ui-myiconnew" ><image src="../../images/newright.png" /></view>
+                                                <image wx:if="{{functionColItem.icon!=''&&functionColItem.icon!=null&&functionColItem.icon!='undefined'}}" src="{{functionColItem.icon}}" class="ui-entryImage" />
+                                                <text class="ui-clotext">{{functionColItem.title}}</text>
+                                            </view>                           
+                        
+                        </ui-col>
+                        </ui-row>
+
+                                </view>
+                                </view>
+                                <!-- 单行 -->
+                              <view class="ui-lineScroll" wx:if="{{moduleItem.moduleFunctionData.functionType==20}}" style="background:{{moduleItem.moduleFunctionData.backgroundColor}}">
+                                    <view class="ui-linetitle">{{moduleItem.moduleFunctionData.title}}</view>
+                                    <scroll-view scroll-x="true" style=" white-space: nowrap; display: flex ;flex-direction: row; enable-flex:true;background: #ffff;height:200rpx;">
+                                            <view class="ui-lineScrollContent {{moduleItem.moduleFunctionData.isShowGridLine==true?'ui-borderRight':'ui-borderNone'}}" wx:for="{{moduleItem.moduleFunctionData.listItem}}" wx:for-item="lineitem" wx:key="key" 
+                                            
+                                            >
+                                                <view class="ui-lineScrollContentDisplayFlex" bindtap="goFucntionLink" data-url="{{lineitem.linkURL}}"
+                                    data-jumpType="{{lineitem.jumpType}}" data-linkJumpType="{{lineitem.linkJumpType}}" data-appid = "{{lineitem.miniProgramAppID}}" data-phone="{{lineitem.phone}}"
+                                    data-isNew="{{lineitem.isNew}}" data-isHot="{{lineitem.isHot}}" data-isOnlyEmp="{{lineitem.isOnlyEmp}}" 
+                                            data-isComingSoon="{{lineitem.isComingSoon}}" data-comingSoonText="{{lineitem.comingSoonText}}" hover-class="bg_ccc"
+                                    >
+                                                    <view class="ui-myiconvip" wx:if="{{lineitem.isOnlyEmp}}"><image src="../../images/vip.png" /></view>
+                                                        <view class="ui-myiconhot" wx:if="{{lineitem.isHot}}"><image src="../../images/listhot.png" /></view>
+                                                        <view class="ui-myiconwait"  wx:if="{{lineitem.isComingSoon}}">
+                                                            <image src="../../images/comingsoon.png" />
+                                                        </view>
+                                                    <image  wx:if="{{lineitem.icon!=''&&lineitem.icon!=null&&lineitem.icon!='undefined'}}" src="{{lineitem.icon}}"  />
+                                                    <text class="ui-clotext">{{lineitem.title}}</text>
+                                                </view>
+                                            </view>
+                                          
+                                    </scroll-view>
+                                </view>
+                                <!-- 多行 -->
+                                <view class="ui-contentline top_tip"  wx:if="{{moduleItem.moduleFunctionData.functionType==30}}" style="background:{{moduleItem.moduleFunctionData.backgroundColor}}">
+                                    <view class="ui-linetitle">{{moduleItem.moduleFunctionData.title}}</view>
+                                    <ui-row height="55" border-bottom hover-class="touchui-hover" wx:for="{{moduleItem.moduleFunctionData.listItem}}" wx:for-item="custom_list" wx:key="key" bindtap="goFucntionLink" data-url="{{custom_list.linkURL}}"
+                                    data-jumpType="{{custom_list.jumpType}}" data-linkJumpType="{{custom_list.linkJumpType}}"
+                                    data-appid = "{{custom_list.miniProgramAppID}}" data-phone="{{custom_list.phone}}"
+                                      data-isNew="{{custom_list.isNew}}" data-isHot="{{custom_list.isHot}}" data-isOnlyEmp="{{custom_list.isOnlyEmp}}" 
+                                    data-isComingSoon="{{custom_list.isComingSoon}}" data-comingSoonText="{{custom_list.comingSoonText}}"
+                                    >
+                                        <ui-col width="44" align="center" vertical-align="middle">
+                                            <view class="left_icon">
+                                                <image wx:if="{{custom_list.icon!=''&&custom_list.icon!=null&&custom_list.icon!='undefined'}}" src="{{custom_list.icon}}" />
+                                            </view>
+                                        </ui-col>
+                                        <ui-col class="text" align="left" vertical-align="middle" >
+                                            <view style="width: 100%;">
+                                                <ui-row >
+                                                    <ui-col align="left" vertical-align="middle" class="ui-middle" >
+                                                      <view class="ui-linemiddle">
+                                                        <text>{{custom_list.title}}</text>
+                                                        <image wx:if="{{custom_list.isNew}}" class="line-new" src="../../images/newleft.png" /> 
+                                                          <image wx:if="{{custom_list.isHot}}" class="line-hot" src="../../images/listhot.png" />
+                                                        <image wx:if="{{custom_list.isOnlyEmp}}" class="line-vip" src="../../images/listvip.png" />
+                                                        <image wx:if="{{custom_list.isComingSoon}}" class="line-comingsoon" src="../../images/comingsoon.png" />
+                                                      </view>
+                                                    </ui-col>
+                                                    <ui-col align="right" width="100" vertical-align="middle" space-right="10" >
+                                                      <view class="ui-left" >
+                                                        <text>{{custom_list.description}}</text>
+                                                        <image class="ui-leftarrow" src="../../images/leftarrow.png"/>
+                                                      </view>
+                                                    </ui-col>
+                                                </ui-row>
+                                              
+                                            </view>
+                                        </ui-col>
+                                    </ui-row>
+                                </view>
+                            </block>
+              
+                </view>
+                
+                <view style="height:{{NAV_HEIGHT}}; background:#f7f7f7;" ></view>
+            </view>
+        </view>
+        <ui-fixed-view bottom="0" left="0" right="0" wx:if="{{_pageLayoutData.listNavigate.length>1}}" >
+            <view class="fixed-view-content" >
+                <view class="fixed-items" style="background:{{_pageLayoutData.navigateBackgroundColor}}"
+                wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateTabItem"  wx:key="navigate" data-num="{{index}}" data-isOnlyEmp="{{navigateTabItem.isOnlyEmp}}"
+                bindtap="btntarbar">
+                    <image class="tarimg" src="{{index==_activeNavigateIndex?navigateTabItem.selectIcon:navigateTabItem.icon}}"/>
+                    <view class="displayname" style="color:{{index==_activeNavigateIndex?_pageLayoutData.navigateTitleSelectColor:_pageLayoutData.navigateTitleColor}};">{{navigateTabItem.title}}</view>
+                </view>
+                <!-- <view class="fixed-items" hover-class="btn_hover_list">c</view> --> 
+            </view>
+        </ui-fixed-view>
+    </view>
+</template>
+
+<script>
+const ht = require("../../../js/ht.js");
+const storage = require("../../../js/storage.js");
+const config = require("../../../js/config.js");
+const app = getApp();
+const WxParse = require("../../../plugin/wxParse/wxParse.js");
+
+export default {
+  config: {
+    navigationBarTitleText: "首页",
+    backgroundColor: "#F4F4F4",
+    navigationBarTextStyle: "black",
+  },
+  data: {
+    _canIUse: wx.canIUse("button.open-type.getUserInfo"),
+
+    _empInfo: null, //-- 会员数据
+    _empStatusGrant: false, //-- 授权状态
+    _empStatusRegister: false, //-- 注册状态
+    _ShowEmpSubscribeImage: false, //-- 显示关注图
+
+    //-- 页面布局数据
+    _pageLayoutData: null,
+
+    _activeNavigateIndex: 0, //-- 当前导航序号
+
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT + "px",
+
+    _enumData: {
+      PageLayoutNavigateTypeEnum_SystemPage: 10,
+      PageLayoutNavigateTypeEnum_JumpMiniProgram: 20,
+      PageLayoutNavigateTypeEnum_JumpLink: 30,
+
+      //-- 页面布局链接跳转类型
+      PageLayoutLinkJumpTypeEnum_Direct: 10,
+      PageLayoutLinkJumpTypeEnum_AppLoadingURL: 20,
+
+      //--页面布局导航模块类型
+      PageLayoutNavigateModuleTypeEnum_Emp: 110,
+      PageLayoutNavigateModuleTypeEnum_Image: 900,
+      PageLayoutNavigateModuleTypeEnum_Banner: 910,
+      PageLayoutNavigateModuleTypeEnum_Content: 920,
+      PageLayoutNavigateModuleTypeEnum_Function: 930,
+
+      //-- 会员模块显示项类型
+      PageLayoutNavigateModuleEmpItemTypeEnum_Balance: 110,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Point: 120,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Growth: 130,
+      PageLayoutNavigateModuleEmpItemTypeEnum_EmpLevel: 210,
+      PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum: 310,
+      PageLayoutNavigateModuleEmpItemTypeEnum_Custom: 999,
+
+      //-- 功能项模块显示项类型
+      PageLayoutNavigateModuleFunctionJumpLink_Direct: 10,
+      PageLayoutNavigateModuleFunctionJumpLink_Apploading: 20,
+      PageLayoutNavigateModuleFunctionJumpLink_Openloading: 30,
+
+      PageLayoutNavigateModuleFunctionJumpLink_Urltype: 110,
+      PageLayoutNavigateModuleFunctionJumpLink_Miniprogramtype: 210,
+      PageLayoutNavigateModuleFunctionJumpLink_Callphonetype: 810
+    }
+  },
+
+  onLoad(options) {
+    const pageMain = this;
+
+    // 登录
+    ht.login({
+      aleardyLogin() {
+        pageMain.getPageLayoutData(options.PageLayoutName);
+      },
+      loginSuccess(data) {
+        pageMain.getPageLayoutData(options.PageLayoutName);
+      },
+      loginFail() {
+        //-- 提示，退出
+      }
+    });
+  },
+
+  linkToEmpQRcode: function(e) {
+    ht.navigate({
+      redirectUrl: "/AppHR/EmpInfo/QRCode"
+    });
+  },
+
+  linkToPerfectEmp: function() {
+    ht.navigate({
+      redirectUrl: "/AppHR/EmpInfo/EmpInfo"
+    });
+  },
+  linkToEmpSignIn: function() {
+    ht.navigate({
+      redirectUrl: "/AppInteract/SignIn/Index"
+    });
+  },
+
+  cancelShowEmpSubscribeImage: function() {
+    this.setData({
+      _ShowEmpSubscribeImage: false
+    });
+  },
+
+  linkToEmpSubscribe: function() {
+    this.setData({
+      _ShowEmpSubscribeImage: true
+    });
+  },
+
+  clickEmpLogo: function(e) {
+    if (
+      e.target.dataset.url != "" &&
+      e.target.dataset.url != null &&
+      e.target.dataset.url != "undefined"
+    ) {
+      ht.navigate({
+        redirectUrl: e.target.dataset.url,
+        isDirect: true
+      });
+    }
+  },
+
+  // 授权用户信息
+  grantUserInfo: function(e) {
+    if (e.detail.errMsg == "getUserInfo:ok") {
+      // 授权成功
+
+      setTimeout(() => {
+        this.setData({
+          _empInfo: {
+            avatarUrl: e.detail.userInfo.avatarUrl,
+            empAlias: e.detail.userInfo.nickName
+          },
+          _empStatusGrant: true
+        });
+      }, 500);
+
+      ht.grantUserInfo({
+        EncryptedData: e.detail.encryptedData,
+        IV: e.detail.iv,
+
+        IsGetEmpPoint: true,
+        IsGetCouponNum: true
+      });
+    } else {
+      // 授权失败
+    }
+  },
+
+  //注册会员
+  registerEmp: function(e) {
+    const pageMain = this;
+
+    ht.registerEmp({
+      EncryptedData: e.detail.encryptedData,
+      IV: e.detail.iv,
+
+      success(data) {
+        //-- 重新获取会员信息
+        pageMain.initModuleEmp();
+      },
+      fail() {}
+    });
+  },
+
+  getPageLayoutData(pageLayoutName) {
+    const pageMain = this;
+
+    if (pageLayoutName == "" || pageLayoutName == undefined) {
+      pageLayoutName = config.defaultPageLayoutName;
+    }
+
+    ht.setForm({
+      url: "/pageLayout/GetEntityByNameAsync",
+      data: {
+        value: pageLayoutName
+      },
+      success: function(data) {
+        //-- 处理导航图标
+        data.listNavigate.forEach(navigateItem => {
+          if (
+            navigateItem.selectIcon == null ||
+            navigateItem.selectIcon == "" ||
+            navigateItem.selectIcon == undefined
+          ) {
+            navigateItem.selectIcon = navigateItem.icon;
+          }
+        });
+
+        pageMain.setData({
+          _pageLayoutData: data
+        });
+
+        //-- 初始化导航
+        pageMain.initNavigateTab(data);
+        //-- 显示第一项
+        pageMain.changeNavigate(0);
+      },
+      fail: function(data) {}
+    });
+  },
+
+  /**
+   * 请求数据是异步的，在onshow，onready生命周期中可能会得到undefined，用回调函数获取数据
+   */
+
+  // 动态导航配置
+  initNavigateTab(data) {
+    //   动态设置当前页面的标题
+    wx.setNavigationBarTitle({
+      title: data.displayName
+    });
+
+    // 设置页面导航条颜色
+    wx.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: data.navigateBackgroundColor,
+      animation: {
+        //动画效果
+        duration: 400, //动画变化的时间 ms
+        timingFunc: "easeIn" // 动画变化方式 linear easeOut easeIn easeInOut
+      },
+      success: function() {},
+      fail: function() {},
+      complete: function() {}
+    });
+
+    // 设置底部导航
+    wx.setTabBarStyle({
+      color: "#FF0000",
+      selectedColor: "#00FF00",
+      backgroundColor: "#0000FF",
+      borderStyle: "white"
+    });
+  },
+
+  // 设置单个导航的数据
+  changeNavigate(index) {
+    var pageMain = this;
+
+    var currNavigate = pageMain.data._pageLayoutData.listNavigate[index];
+
+    if (
+      currNavigate.navigateType ==
+      pageMain.data._enumData.PageLayoutNavigateTypeEnum_SystemPage
+    ) {
+      this.showNaivgate(index);
+    } else if (
+      (currNavigate.navigateType =
+        pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpMiniProgram)
+    ) {
+      ht.navigateToMiniprogram({
+        appID: currNavigate.miniProgramAppID,
+        path: currNavigate.miniProgramPath
+      });
+    } else if (
+      (currNavigate.navigateType =
+        pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpLink)
+    ) {
+      if (
+        currNavigate.LinkJumpType ==
+        pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+      ) {
+        //直跳
+        ht.navigate({
+          redirectUrl: url,
+          isDirect: true
+        });
+      } else if (
+        currNavigate.LinkJumpType ==
+        pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+      ) {
+        //apploading跳转
+        ht.navigate({
+          redirectUrl: url
+        });
+      }
+    }
+  },
+
+  // 页面信息
+  showNaivgate(index) {
+    var pageMain = this;
+
+    var pageLauoutData = pageMain.data._pageLayoutData;
+    var navigateData = pageLauoutData.listNavigate[index];
+
+    if (navigateData.IsLoadingFinish) {
+      return;
+    }
+
+    var listPromise = [];
+
+    //-- 循环初始化
+    navigateData.listModule.map((moduleItem, moduleIndex) => {
+      // 循环miniProgramPageBlockInfo
+      if (
+        moduleItem.moduleType ==
+        pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Emp
+      ) {
+        //会员页
+        pageMain.initModuleEmp();
+      } else if (
+        moduleItem.moduleType ==
+        pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Image
+      ) {
+        //图片
+      } else if (
+        moduleItem.moduleType ==
+        pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Banner
+      ) {
+        //轮播
+        listPromise.push(
+          pageMain.initModuleBanner(moduleItem)
+          .then(function(){
+            var sysInfo = wx.getSystemInfoSync();
+            var screenWidth = sysInfo.screenWidth;
+            wx.getImageInfo({
+              //获取图片长宽等信息
+              src: moduleItem.moduleData.pages[0].imageURL,
+              success: function(res) {
+                var imgw = res.width;
+                var imgh = res.height;
+                var bannerHeight = screenWidth * imgh / imgw;
+
+                moduleItem.moduleData.bannerHeight = bannerHeight;
+              }
+            });
+
+          })
+        
+        
+        
+        
+        );
+      } else if (
+        moduleItem.moduleType ==
+        pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Content
+      ) {
+        //图文
+        listPromise.push(pageMain.initModuleContent(moduleItem));
+      } else if (
+        moduleItem.moduleType ==
+        pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Function
+      ) {
+        //功能项
+      }
+
+    });
+
+    //-- 加载完成
+    navigateData.IsLoadingFinish = true;
+
+
+    //-- 统一赋值
+    Promise.all(listPromise).then(function() {
+      pageMain.setData({
+        _pageLayoutData: pageLauoutData
+      });
+    });
+  },
+
+  // 会员
+  initModuleEmp() {
+    const pageMain = this;
+
+    //-- 已获取过会员
+    if (pageMain.data._empInfo) {
+      return;
+    }
+
+    var isGetEmpMoney = false;
+    var isGetEmpPoint = false;
+    var isGetEmpGrowth = false;
+    var isGetCouponNum = false;
+    var isShowPerfectEmpInfo = false;
+    var isShowSignIn = false;
+    var isShowWeixinEmpSubscribe = false;
+
+    pageMain.data._pageLayoutData.listNavigate.forEach(navigateItem => {
+      if (
+        navigateItem.navigateType ==
+        pageMain.data._enumData.PageLayoutNavigateTypeEnum_SystemPage
+      ) {
+        navigateItem.listModule.forEach(moduleItem => {
+          if (
+            moduleItem.moduleType ==
+            pageMain.data._enumData.PageLayoutNavigateModuleTypeEnum_Emp
+          ) {
+            if (moduleItem.moduleEmpData.isShowPerfectEmpInfo)
+              isShowPerfectEmpInfo = true;
+            if (moduleItem.moduleEmpData.isShowSignIn) isShowSignIn = true;
+            if (moduleItem.moduleEmpData.isShowWeixinEmpSubscribe)
+              isShowWeixinEmpSubscribe = true;
+
+            moduleItem.moduleEmpData.listItem.forEach(empItem => {
+              switch (empItem.itemType) {
+                case pageMain.data._enumData
+                  .PageLayoutNavigateModuleEmpItemTypeEnum_Balance:
+                  isGetEmpMoney = true;
+                  break;
+                case pageMain.data._enumData
+                  .PageLayoutNavigateModuleEmpItemTypeEnum_Point:
+                  isGetEmpPoint = true;
+                  break;
+                case pageMain.data._enumData
+                  .PageLayoutNavigateModuleEmpItemTypeEnum_Growth:
+                  isGetEmpGrowth = true;
+                  break;
+                case pageMain.data._enumData
+                  .PageLayoutNavigateModuleEmpItemTypeEnum_CouponNum:
+                  isGetCouponNum = true;
+                  break;
+              }
+            });
+          }
+        });
+      }
+    });
+
+    ht.setForm({
+      url: "/weixinEmpMerge/QueryMergeDataAsync",
+      data: {
+        isGetEmpMoney: isGetEmpMoney,
+        isGetEmpPoint: isGetEmpPoint,
+        isGetEmpGrowth: isGetEmpGrowth,
+        isGetCouponNum: isGetCouponNum,
+        isShowPerfectEmpInfo: isShowPerfectEmpInfo,
+        isShowSignIn: isShowSignIn,
+        isShowWeixinEmpSubscribe: isShowWeixinEmpSubscribe
+      },
+      success: function(data) {
+        if (data.endDay != null) {
+          data.endDay = data.endDay.replace(/-/g, ".").substring(0, 10);
+        }
+        if (data.phone != null) {
+          data.phoneFilter = data.phone.replace(
+            /^(\d{3})\d{4}(\d{4})$/,
+            "$1****$2"
+          );
+        }
+
+        pageMain.setData({
+          _empInfo: data
+        });
+
+        pageMain.checkEmpStatus(data);
+      }
+    });
+  },
+
+  checkEmpStatus(empInfo) {
+    const pageMain = this;
+
+    if (empInfo.isBindEmp) {
+      storage.setBindEmp();
+      pageMain.setData({
+        _empStatusGrant: true,
+        _empStatusRegister: true
+      });
+    } else if (
+      empInfo.AvatarUrl != null &&
+      empInfo.AvatarUrl != "" &&
+      empInfo.AvatarUrl != undefined
+    ) {
+      pageMain.setData({
+        _empStatusGrant: true,
+        _empStatusRegister: false
+      });
+    }
+  },
+
+  // 图文
+  initModuleContent(moduleItem) {
+    const pageMain = this;
+
+    return ht.promiseSetForm({
+      url: "/content/GetEntityByNameAsync",
+      data: {
+        value: moduleItem.moduleContentData.ContentName
+      },
+      success: function(data) {
+        WxParse.wxParse(
+          moduleItem.moduleContentData.ContentName,
+          "html",
+          data.showText,
+          pageMain,
+          0,
+          config.imageRootPath
+        );
+      },
+      fail: function(data) {}
+    });
+  },
+
+  // 轮播
+  initModuleBanner(moduleItem) {
+    return ht.promiseSetForm({
+      url: "/banner/GetBannerByNameAsync",
+      data: {
+        value: moduleItem.moduleBannerData.bannerName
+      },
+      success: function(data) {
+
+        moduleItem.moduleData = data;        
+      },
+      fail: function(data) {}
+    });
+  },
+
+  goBannerLink(e) {
+    const url = e.currentTarget.dataset.url;
+    if (url != null) {
+      ht.navigate({
+        redirectUrl: url,
+        isDirect: true
+      });
+    }
+  },
+
+  goImageLink(e) {
+    const url = e.currentTarget.dataset.url;
+    const linkjumptype = e.currentTarget.dataset.linkjumptype;
+    if (
+      linkjumptype == pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+    ) {
+      //直跳
+      ht.navigate({
+        redirectUrl: url,
+        isDirect: true
+      });
+    } else if (
+      linkjumptype == pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+    ) {
+      //apploading跳转
+      ht.navigate({
+        redirectUrl: url
+      });
+    }
+  },
+
+  goFucntionLink(e) {
+    console.log(e);
+    const url = e.currentTarget.dataset.url;
+    const jumpType = e.currentTarget.dataset.jumptype;
+    const linkjumptype = e.currentTarget.dataset.linkjumptype;
+    const appID = e.currentTarget.dataset.appid;
+    const phone = e.currentTarget.dataset.phone;
+    const isNew = e.currentTarget.dataset.isnew;
+    const isHot = e.currentTarget.dataset.ishot;
+    const isOnlyEmp = e.currentTarget.dataset.isonlyemp;
+    const isComingSoon = e.currentTarget.dataset.iscomingsoon;
+    const comingSoonText = e.currentTarget.dataset.comingsoontext;
+    if (isOnlyEmp) {
+      if (storage.getStorageSync("IsBindEmp")) {
+        //-- emp
+      } else {
+        wx.showToast({
+          title: "请注册为会员",
+          //icon: 'success',
+          duration: 2000
+        });
+        return;
+      }
+    }
+
+    if (isComingSoon) {
+      wx.showToast({
+        title: comingSoonText,
+        //icon: 'success',
+        duration: 2000
+      });
+      return;
+    }
+
+    if (
+      jumpType ==
+      this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Urltype
+    ) {
+      //跳转链接
+      if (
+        linkjumptype ==
+        this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Direct
+      ) {
+        //直跳
+        if (url != null && url != "" && url != "undefined") {
+          ht.navigate({
+            redirectUrl: url,
+            isDirect: true
+          });
+        }
+      }
+      if (
+        linkjumptype ==
+        this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Apploading
+      ) {
+        //apploading跳转
+        if (url != null && url != "" && url != "undefined") {
+          ht.navigate({
+            redirectUrl: url
+          });
+        }
+      }
+      if (
+        linkjumptype ==
+        this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Openloading
+      ) {
+        //openloading跳转
+        wx.showToast({
+          title: "openloading跳转",
+          icon: "success",
+          duration: 2000
+        });
+      }
+    }
+    if (
+      jumpType ==
+      this.data._enumData
+        .PageLayoutNavigateModuleFunctionJumpLink_Miniprogramtype
+    ) {
+      //跳转小程序
+      wx.navigateToMiniProgram({
+        appId: appID,
+        path: "pages/tominiprogram/tominiprogram",
+        extraData: {
+          foo: "bar"
+        },
+        envVersion: "develop",
+        success(res) {
+          // 打开成功
+        }
+      });
+    }
+    if (
+      jumpType ==
+      this.data._enumData.PageLayoutNavigateModuleFunctionJumpLink_Callphonetype
+    ) {
+      //拨打电话
+      ht.navigateToCallPhone(phone);
+    }
+    // ht.navigate({
+    //     redirectUrl: url,
+    //     isDirect:true,
+    // });
+  },
+
+  // 导航栏切换
+  btntarbar(e) {
+    const pageMain = this;
+
+    const index = e.currentTarget.dataset.num;
+    const isOnlyEmp = e.currentTarget.dataset.isonlyemp;
+    if (isOnlyEmp && !storage.isBindEmp()) {
+      wx.showModal({
+        title: "提示",
+        content: "请先注册为会员",
+        success: function(sm) {
+          if (sm.confirm) {
+          } else if (sm.cancel) {
+          }
+        }
+      });
+    } else {
+      pageMain.setData({
+        _activeNavigateIndex: index
+      });
+
+      pageMain.changeNavigate(index);
+    }
+  },
+
+  onShow(options) {}
+};
+</script>
+
+<style lang="less">
+@import "./static/utils/mixins.less";
+
+page {
+  background: #f7f7f7;
+  display: flex;
+}
+.ui-content {
+  width: 718rpx;
+  margin: 0 auto;
+  box-sizing: content-box;
+  padding: 16rpx;
+  padding-top: 21rpx;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+  &.ui-full {
+    width: 718rpx;
+    padding: 0;
+    margin: 12rpx auto;
+  }
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    // border-bottom: 1rpx solid #f3f3f3;
+    color: #0d0e1a;
+    font-size: 30rpx;
+  }
+}
+
+.swiper image {
+  width: 100%;
+  height: auto;
+}
+.ui-imageContent {
+  image {
+    width: 702rpx;
+    margin: 0 auto;
+  }
+}
+.ui-picImage {
+  width: 100%;
+}
+.content {
+  .mix-flex-center();
+}
+.ui-size {
+  font-size: 100rpx;
+  color: #f99;
+}
+.btn_hover_list {
+  opacity: 0.6;
+  background-color: #333;
+}
+
+.fixed-view-content {
+  padding: 0 0;
+  height: 98rpx;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  color: #fff;
+  background-color: #ccc;
+  z-index: 99;
+  .fixed-items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .tarimg {
+    width: 44rpx;
+    height: 44rpx;
+    margin-bottom: 8rpx;
+    margin-top: 7rpx;
+  }
+  .displayname {
+    font-size: 22rpx;
+    color: #000;
+  }
+}
+.WxEmojiView.wxParse-inline {
+  height: 300rpx;
+}
+.btnitems {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  .ui-myiconvip {
+    width: 66rpx;
+    height: 66rpx;
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    & > image {
+      width: 66rpx;
+      height: 66rpx;
+    }
+  }
+  .ui-myiconnew {
+    width: 56rpx;
+    height: 32rpx;
+
+    position: absolute;
+    left: 11rpx;
+    top: 20rpx;
+    & > image {
+      width: 56rpx;
+      height: 32rpx;
+    }
+  }
+
+  .ui-myiconhot {
+    width: 56rpx;
+    height: 32rpx;
+
+    position: absolute;
+    right: 11rpx;
+    top: 20rpx;
+    & > image {
+      width: 56rpx;
+      height: 32rpx;
+    }
+  }
+  .ui-myiconwait {
+    width: 92rpx;
+    height: 32rpx;
+    position: absolute;
+    right: 0;
+    top: 0;
+    & > image {
+      width: 92rpx;
+      height: 32rpx;
+    }
+  }
+}
+
+.text {
+  margin-left: 20rpx;
+}
+.content-warpper {
+  display: flex;
+  height: 200rpx;
+}
+.image {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-left: 40rpx;
+  align-self: center;
+}
+.username {
+  font-size: 40rpx;
+  align-self: center;
+  margin-left: 40rpx;
+  margin-right: 40rpx;
+}
+.btn {
+  align-self: center;
+}
+.membership_card {
+  width: 100%;
+  height: 350rpx;
+  border-radius: 10rpx;
+  margin: 0 auto;
+  margin-bottom: 24rpx;
+  color: #000;
+  font-size: 50rpx;
+}
+.personal {
+  margin-bottom: 24rpx;
+  background: #fff;
+  border-radius: 10rpx;
+  height: 350rpx;
+  border-radius: 20rpx;
+  display: flex;
+  background: #0960db;
+  color: #fff;
+  flex-direction: column;
+  padding-left: 24rpx;
+  position: relative;
+  overflow: hidden;
+
+  .image {
+    width: 100rpx;
+    height: 100rpx;
+    margin: 0;
+    margin-right: 24rpx;
+    border-radius: 50%;
+    z-index: 10;
+  }
+
+  .ui-text {
+    margin-top: 138rpx;
+    font-size: 32rpx;
+  }
+  .personal-title {
+    display: flex;
+    margin-top: 32rpx;
+    align-items: center;
+    position: relative;
+    .ui-phoneitems {
+      margin-top: 16rpx;
+    }
+    .person-emName {
+      font-size: 32rpx;
+      margin-bottom: 56rpx;
+      z-index: 11;
+      vertical-align: middle;
+    }
+    .person-phoneNum {
+      font-size: 24rpx;
+      line-height: 34rpx;
+      margin-right: 8rpx;
+      border-radius: 15rpx;
+      padding: 0rpx 12rpx;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    .gold-membership-card {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 20rpx;
+      line-height: 34rpx;
+      color: #804d1a;
+      padding: 0 8rpx;
+      height: 36rpx;
+      border-radius: 18rpx;
+      background-image: linear-gradient(
+        90deg,
+        rgb(230, 211, 174) 0%,
+        rgb(199, 166, 118) 100%
+      );
+      text-align: center;
+      margin-left: 16rpx;
+    }
+    .person-qrcode {
+      width: 44rpx;
+      height: 46rpx;
+      position: absolute;
+      top: 20rpx;
+      right: 46rpx;
+    }
+  }
+  .ui-personalitems {
+    position: absolute;
+    height: 120rpx;
+    right: 22rpx;
+    bottom: 38rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .ui-personalitem {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 176rpx;
+      height: 40rpx;
+      border-radius: 40rpx;
+      background: rgba(0, 0, 0, 0.1);
+      font-size: 20rpx;
+      margin-top: 10rpx;
+      color: #fff;
+      text-align: center;
+      .ui-tipimg {
+        width: 0.58rem;
+        height: 0.58rem;
+        margin-right: 20rpx;
+      }
+    }
+  }
+}
+
+.ui-button {
+  width: 300rpx;
+  height: 70rpx;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  bottom: 60rpx;
+  border-radius: 40rpx;
+  overflow: hidden;
+  button {
+    position: static;
+    width: 300rpx;
+    height: 70rpx;
+    line-height: 70rpx;
+    margin: 0;
+    &::after {
+      display: none;
+    }
+  }
+}
+.three_swiper {
+  margin-bottom: 24rpx;
+  //   height: 240rpx;
+  .swiper_item {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10rpx;
+    margin-bottom: 24rpx;
+    overflow: hidden;
+    position: relative;
+    image {
+      flex: 1;
+      margin-right: 5px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    .ht-bannerTitle {
+      position: absolute;
+      bottom: 0rpx;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      background: rgba(233, 233, 233, 0.6);
+      text-align: center;
+      height: 40rpx;
+      line-height: 40rpx;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+.ui-entry {
+  display: flex;
+  background: #fff;
+  flex-wrap: wrap;
+  .ui-col {
+    align-items: center;
+  }
+  .ui-entryImage {
+    width: 48rpx;
+    height: 48rpx;
+    margin-top: 40rpx;
+    margin-bottom: 8rpx;
+  }
+  .ui-clotext {
+    margin-bottom: 40rpx;
+    color: rgb(51, 51, 51);
+    font-size: 26rpx;
+    line-height: 46rpx;
+  }
+}
+
+.left_icon {
+  text-align: center;
+  line-height: 50px;
+
+  overflow: hidden;
+  & > image {
+    width: 38rpx;
+    height: 38rpx;
+  }
+}
+.left_icon2 {
+  background-color: #ff7360;
+}
+.left_icon3 {
+  background-color: #39ccc5;
+}
+.text {
+  text {
+    font-size: 16px;
+    color: #313338;
+  }
+  view {
+    color: #9c9fa4;
+    font-size: 12px;
+    .mix-text-overflow();
+  }
+}
+
+.ui-lineScroll {
+  display: flex;
+  flex-direction: column;
+  margin: 12rpx 0;
+  .ui-lineScrollContent {
+    width: 214rpx;
+    height: 200rpx;
+    display: inline-block;
+    .ui-lineScrollContentDisplayFlex {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+      image {
+        width: 48rpx;
+        height: 48rpx;
+      }
+      text {
+        font-size: 28rpx;
+        line-height: 48rpx;
+        color: #1a1a1a;
+      }
+      .ui-myiconvip {
+        width: 66rpx;
+        height: 66rpx;
+        position: absolute;
+        left: 0;
+        top: 0;
+
+        & > image {
+          width: 66rpx;
+          height: 66rpx;
+        }
+      }
+      .ui-myiconhot {
+        width: 56rpx;
+        height: 32rpx;
+
+        position: absolute;
+        right: 36rpx;
+        top: 20rpx;
+        & > image {
+          width: 56rpx;
+          height: 32rpx;
+        }
+      }
+      .ui-myiconwait {
+        width: 92rpx;
+        height: 32rpx;
+        position: absolute;
+        right: 0;
+        top: 0;
+        & > image {
+          width: 92rpx;
+          height: 32rpx;
+        }
+      }
+    }
+  }
+}
+
+.ui-borderRight {
+  border-right: 1rpx solid #f3f3f3;
+}
+.ui-borderLeft {
+  border-left: 1rpx solid #f3f3f3;
+}
+.ui-borderNone {
+  border-right: none;
+}
+
+.bg_ccc {
+  background: #ccc;
+}
+.ui-row-border-bottom:after {
+  border-bottom: 0px solid #e6e6e6;
+}
+.ui-lineScroll {
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    border-bottom: 1rpx solid #f3f3f3;
+  }
+}
+.ui-contentline {
+  margin: 24rpx 16rpx;
+  border-radius: 20rpx;
+  background: #fff;
+  .ui-linetitle {
+    text-indent: 40rpx;
+    line-height: 88rpx;
+    font-size: 32rpx;
+    border-bottom: 1rpx solid #f3f3f3;
+  }
+  .text {
+    margin: 0;
+    border-bottom: 1px solid #f3f3f3;
+    view {
+      overflow: visible;
+    }
+    .line-vip {
+      width: 52rpx;
+      height: 30rpx;
+    }
+    .ui-linemiddle {
+      display: flex;
+      align-items: center;
+
+      .line-vip {
+        margin-left: 20rpx;
+      }
+    }
+    .line-hot {
+      width: 48rpx;
+      height: 28rpx;
+      margin-left: 14rpx;
+      position: relative;
+      top: -28rpx;
+    }
+    .line-new {
+      width: 48rpx;
+      height: 28rpx;
+      margin-left: 14rpx;
+      position: relative;
+      top: -28rpx;
+    }
+    .line-comingsoon {
+      width: 92rpx;
+      height: 32rpx;
+      margin-left: 20rpx;
+    }
+  }
+  .ui-leftarrow {
+    width: 20rpx;
+    height: 20rpx;
+    margin-left: 16rpx;
+  }
+  .ui-left {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    text {
+      color: #999999;
+    }
+  }
+}
+.emp-item {
+  display: flex;
+  align-items: center;
+  height: 150rpx;
+  overflow: hidden;
+  & > view {
+    flex: 1;
+    text-align: center;
+  }
+  .ui-empitems {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    .ui-empitemsNo {
+      font-size: 32rpx;
+      color: #000;
+    }
+    .ui-empitemstitle {
+      font-size: 26rpx;
+      color: #666;
+      margin-top: 22rpx;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      image {
+        width: 26rpx;
+        height: 26rpx;
+        margin-right: 10rpx;
+      }
+    }
+  }
+}
+</style>
+

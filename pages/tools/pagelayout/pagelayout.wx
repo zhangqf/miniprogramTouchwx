@@ -1,0 +1,458 @@
+
+
+<template>
+ 
+    <view style="position:relative;width:100%;display:flex;flex-direction:column;padding-bottom: 20rpx;" class="{{_isShowEmpSubscribeImage==true?'preventScroll':''}}">
+        <view wx:if="{{_isShowEmpSubscribeImage}}" bindtap="cancelShowEmpSubscribeImage" style="position:absolute;background:rgba(33,33,33,.4);width:100%;height:100%; z-index:11;top:0;left:0">
+            <image src="{{ _subscribeImageURL}}"  style="position: flex;left: 0;right: 0;margin:15% auto;top: 13%;height:667rpx;width:680rpx;" />
+        </view>
+    <view style="overflow-y:scroll;flex:1;margin-bottom: 10px;">
+    <view wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateItem" wx:for-index="navigateIndex" wx:key="navigate" style="width:100%;">
+        <view class="navigate" wx:for="{{navigateItem.listModule}}" wx:for-item="listModule" wx:key="key" hidden="{{!navigateItem.isShow}}">
+            <ht-pagelayout-banner wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Banner}}" loading={{navigateItem.isLoading}} bannerName="{{listModule.moduleBannerData.bannerName}}" ></ht-pagelayout-banner>
+            <ht-pagelayout-empinfo id="empmoudle" 
+            bind:eventEmpSubscribe="eventHandleShowSubImage"  
+            bind:eventRegister="registerEmp" 
+            wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Emp}}" 
+            loading={{navigateItem.isLoading}} 
+            moduleEmpData="{{listModule.moduleEmpData}}" ></ht-pagelayout-empinfo>
+            <ht-pagelayout-content wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Content}}" loading={{navigateItem.isLoading}} contentName="{{listModule.moduleContentData.contentName}}"></ht-pagelayout-content>
+            <ht-pagelayout-function bind:eventPopupEmpRegister="eventHandlePopupEmpRegister" wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Function}}" moduleFunctionData="{{listModule.moduleFunctionData}}"></ht-pagelayout-function>
+            <block wx:if="{{listModule.moduleType == _enumData.PageLayoutNavigateModuleTypeEnum_Image}}">
+                <view class="ui-content">
+                    <image class="ui-picImage" mode="widthFix" src="{{listModule.moduleImageData.imageURL}}" lazy-load=true show-menu-by-longpress=true data-url="{{listModule.moduleImageData.linkURL}}"
+                    data-linkJumpType="{{listModule.moduleImageData.linkJumpType}}" bindtap="goImageLink"/>
+                </view>
+            </block>
+        </view>
+       
+    </view>
+    </view>
+      <view style="height:{{NAV_HEIGHT}};" ></view>       
+    <ui-fixed-view bottom="0" left="0" right="0" wx:if="{{_pageLayoutData.listNavigate.length > 1}}" >
+       <view class="fixed-view-content" >
+           <view class="fixed-items" style="background:{{_pageLayoutData.navigateBackgroundColor}}"
+           wx:for="{{_pageLayoutData.listNavigate}}" wx:for-item="navigateTabItem"  wx:key="navigate" data-num="{{index}}" data-isOnlyEmp="{{navigateTabItem.isOnlyEmp}}"
+           bindtap="btntarbar">
+               <image class="tarimg" src="{{index==_activeNavigateIndex?navigateTabItem.selectIcon:navigateTabItem.icon}}"/>
+               <view class="displayname" style="color:{{index==_activeNavigateIndex?_pageLayoutData.navigateTitleSelectColor:_pageLayoutData.navigateTitleColor}};">{{navigateTabItem.title}}</view>
+           </view>
+         
+       </view>
+    </ui-fixed-view>
+    <ui-popup show="{{ _isShowPopupEmpRegister }}" height="220" background="transparent" >
+        <view class="popupEmpRegister" >
+            <ui-row height="40" >
+                <ui-col vertical-align="middle" space-left="20"></ui-col>
+                <ui-col width="40" vertical-align="middle" align="center" bindtap="cancelRegisterEmp">
+                    <ui-icon type="x" size="18" color="#000"></ui-icon>
+                </ui-col>
+            </ui-row>
+            <view class="popupEmpRegisterTitle">您还未注册会员</view>
+            <ui-row height="60" style="margin-top:30px">
+                <ui-col style="padding-left:70rpx;padding-right:25rpx;" vertical-align="middle">
+                    <button style="border:#C2C2C2 solid 1px;background:#fff;"   bindtap="cancelRegisterEmp">取消</button>
+                </ui-col>
+                <ui-col  style="padding-left:25rpx;padding-right:70rpx;" vertical-align="middle">
+                    <button style="background:#166CE6" type="primary" open-type="getPhoneNumber" bindgetphonenumber="registerEmp">注册/绑卡</button>
+                </ui-col>
+            </ui-row>
+        </view>
+    </ui-popup>
+    </view>
+</template>
+
+<script>
+const ht = require("../../../js/ht.js");
+const storage = require("../../../js/storage.js");
+const config = require("../../../js/config.js");
+const app = getApp();
+
+export default {
+  config: {
+    navigationBarTitleText: "首页",
+    backgroundColor: "#F4F4F4",
+    navigationBarTextStyle: "black",
+    component: true,
+    usingComponents: {
+      "ht-pagelayout-banner":
+        "../../../components/pagelayout/ht-pagelayout-banner",
+      "ht-pagelayout-content":
+        "../../../components/pagelayout/ht-pagelayout-content",
+      "ht-pagelayout-function":
+        "../../../components/pagelayout/ht-pagelayout-function",
+      "ht-pagelayout-empinfo":
+        "../../../components/pagelayout/ht-pagelayout-empinfo"
+    }
+  },
+  data: {
+    //-- 页面布局数据
+    _pageLayoutData: null,
+    //-- 当前导航序号
+    _activeNavigateIndex: 0,
+
+    //-- 关注（开启通知）
+    _isShowEmpSubscribeImage: false,
+    _subscribeImageURL: null,
+    //-- 会员注册弹出
+    _isShowPopupEmpRegister: false,
+
+    NAV_HEIGHT: wx.STATUS_BAR_HEIGHT + wx.DEFAULT_HEADER_HEIGHT + "rpx",
+    POPUP_TOP: (wx.WIN_HEIGHT - 270) / 2 + "px",
+    _enumData: {
+      PageLayoutNavigateTypeEnum_SystemPage: 10,
+      PageLayoutNavigateTypeEnum_JumpMiniProgram: 20,
+      PageLayoutNavigateTypeEnum_JumpLink: 30,
+
+      //-- 页面布局链接跳转类型
+      PageLayoutLinkJumpTypeEnum_Direct: 10,
+      PageLayoutLinkJumpTypeEnum_AppLoadingURL: 20,
+
+      //--页面布局导航模块类型
+      PageLayoutNavigateModuleTypeEnum_Emp: 110,
+      PageLayoutNavigateModuleTypeEnum_Image: 900,
+      PageLayoutNavigateModuleTypeEnum_Banner: 910,
+      PageLayoutNavigateModuleTypeEnum_Content: 920,
+      PageLayoutNavigateModuleTypeEnum_Function: 930
+    }
+  },
+
+  onLoad(options) {
+    var pageMain = this;
+    // 登录
+    ht.login({
+      aleardyLogin() {
+        pageMain.getPageLayoutData(options.PageLayoutName);
+      },
+      loginSuccess(data) {
+        pageMain.getPageLayoutData(options.PageLayoutName);
+      },
+      loginFail() {
+        //-- 提示，退出
+      }
+    });
+  },
+
+  eventHandleShowSubImage(e) {
+    this.setData({
+      _isShowEmpSubscribeImage: true,
+      _subscribeImageURL: e.detail.subscribeImageURL
+    });
+  },
+  cancelShowEmpSubscribeImage: function() {
+    this.setData({
+      _isShowEmpSubscribeImage: false
+    });
+  },
+
+  eventHandlePopupEmpRegister() {
+    this.setData({
+      _isShowPopupEmpRegister: true
+    });
+  },
+  cancelRegisterEmp() {
+    this.setData({
+      _isShowPopupEmpRegister: false
+    });
+  },
+
+  //注册会员
+  registerEmp: function(e) {
+    const pageMain = this;
+    pageMain.setData({
+        _isShowPopupEmpRegister:false
+    })
+
+
+    ht.registerEmp({
+      EncryptedData: e.detail.EncryptedData,
+      IV: e.detail.IV,
+
+      success(data) {
+        pageMain.selectComponent("#empmoudle").initModuleEmp();
+      },
+      fail() {}
+    });
+  },
+
+  getPageLayoutData: function(pageLayoutName) {
+    const pageMain = this;
+
+    if (pageLayoutName == "" || pageLayoutName == undefined) {
+      pageLayoutName = config.defaultPageLayoutName;
+    }
+
+    ht.setForm({
+      url: "/pageLayout/GetEntityByNameAsync",
+      data: {
+        value: pageLayoutName
+      },
+      success: function(data) {
+        //-- 处理导航图标
+        data.listNavigate.forEach(navigateItem => {
+          if (
+            navigateItem.selectIcon == null ||
+            navigateItem.selectIcon == "" ||
+            navigateItem.selectIcon == undefined
+          ) {
+            navigateItem.selectIcon = navigateItem.icon;
+          }
+        });
+
+        data.listNavigate.forEach(function(ele, i) {
+          Object.assign(ele, { isLoading: false, isShow: false });
+        });
+        pageMain.setData({
+          _pageLayoutData: data
+        });
+
+        //-- 初始化导航
+        pageMain.initNavigateTab(data);
+        //-- 显示第一项
+        pageMain.changeNavigate(0);
+      },
+      fail: function(data) {}
+    });
+  },
+  // 动态导航配置
+  initNavigateTab(data) {
+    //   动态设置当前页面的标题
+    wx.setNavigationBarTitle({
+      title: data.displayName
+    });
+
+    // 设置页面导航条颜色
+    wx.setNavigationBarColor({
+      frontColor: "#000000",
+      backgroundColor: data.navigateBackgroundColor,
+      animation: {
+        //动画效果
+        duration: 400, //动画变化的时间 ms
+        timingFunc: "easeIn" // 动画变化方式 linear easeOut easeIn easeInOut
+      },
+      success: function() {},
+      fail: function() {},
+      complete: function() {}
+    });
+
+    // 设置底部导航
+    wx.setTabBarStyle({
+      color: "#FF0000",
+      selectedColor: "#00FF00",
+      backgroundColor: "#0000FF",
+      borderStyle: "white"
+    });
+  },
+
+  // 设置单个导航的数据
+  changeNavigate(index) {
+    var pageMain = this;
+
+    var currNavigate = pageMain.data._pageLayoutData.listNavigate[index];
+
+    if (
+      currNavigate.navigateType ==
+      pageMain.data._enumData.PageLayoutNavigateTypeEnum_SystemPage
+    ) {
+      this.showNaivgate(index);
+    } else if (
+      currNavigate.navigateType ==
+      pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpMiniProgram
+    ) {
+      ht.navigateToMiniprogram({
+        appID: currNavigate.miniProgramAppID,
+        path: currNavigate.miniProgramPath
+      });
+    } else if (
+      currNavigate.navigateType ==
+      pageMain.data._enumData.PageLayoutNavigateTypeEnum_JumpLink
+    ) {
+      if (
+        currNavigate.linkURL != "" &&
+        currNavigate.linkURL != null &&
+        currNavigate.linkURL != undefined
+      ) {
+        if (
+          currNavigate.linkJumpType ==
+          pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+        ) {
+          //直跳
+          ht.navigate({
+            redirectUrl: currNavigate.linkURL,
+            isDirect: true
+          });
+        } else if (
+          currNavigate.linkJumpType ==
+          pageMain.data._enumData.PageLayoutLinkJumpTypeEnum_AppLoadingURL
+        ) {
+          //apploading跳转
+          ht.navigate({
+            redirectUrl: currNavigate.linkURL
+          });
+        }
+      }
+    }
+  },
+  // 页面信息
+  showNaivgate(index) {
+    var pageMain = this;
+
+    var pageLayoutData = pageMain.data._pageLayoutData;
+    var navigateData = pageLayoutData.listNavigate[index];
+
+    //-- 全部置为隐藏状态
+    pageLayoutData.listNavigate.forEach(function(item, i) {
+      item.isShow = false;
+    });
+
+    //-- 置为显示状态
+    navigateData.isShow = true;
+
+    // //-- 如未加载，置为加载
+    navigateData.isLoading = true;
+
+    pageMain.setData({
+      _pageLayoutData: pageLayoutData
+    });
+  },
+
+  //-- 图片模块链接点击跳转
+  goImageLink(e) {
+    const url = e.currentTarget.dataset.url;
+    if (url != "" && url != null && url != undefined) {
+      const linkjumptype = e.currentTarget.dataset.linkjumptype;
+      if (
+        linkjumptype == this.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+      ) {
+        //直跳
+        ht.navigate({
+          redirectUrl: url,
+          isDirect: true
+        });
+      } else if (
+        linkjumptype == this.data._enumData.PageLayoutLinkJumpTypeEnum_Direct
+      ) {
+        //apploading跳转
+        ht.navigate({
+          redirectUrl: url
+        });
+      }
+    }
+  },
+
+  //-- 导航点击事件
+  btntarbar(e) {
+    const pageMain = this;
+
+    const index = e.currentTarget.dataset.num;
+    const isOnlyEmp = e.currentTarget.dataset.isonlyemp;
+    if (isOnlyEmp && !storage.isBindEmp()) {
+      pageMain.eventHandlePopupEmpRegister();
+    } else {
+      pageMain.setData({
+        _activeNavigateIndex: index
+      });
+
+      pageMain.changeNavigate(index);
+    }
+  },
+  onReady() {},
+  onShow(options) {}
+};
+</script>
+
+<style lang="less">
+@import "./static/utils/mixins.less";
+.ui-popup {
+  .ui-popup-content {
+    bottom: 36%;
+  }
+}
+
+.preventScroll {
+  overflow: hidden;
+}
+
+.popupEmpRegisterTitle {
+  text-align: center;
+  color: #000;
+  font-size: 18px;
+  margin-top: 60rpx;
+}
+.popupEmpRegister {
+  width: 90%;
+  background-color: #fff;
+  height: 220px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  bottom: 36%;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 92%;
+  .title {
+    line-height: 30px;
+    font-size: 18px;
+    padding: 10px 20px 0;
+  }
+}
+
+.ui-popup-content.bottom {
+  bottom: 36%;
+}
+.ui-content {
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: content-box;
+  //   padding: 16rpx;
+  //   padding-top: 21rpx;
+  background: #f7f7f7;
+  padding-bottom: 0;
+  min-height: 100%;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+page {
+  background: #f7f7f7;
+  display: flex;
+}
+.navigate {
+  width: 100%;
+  padding: 12rpx;
+}
+.ui-picImage {
+  width: 100%;
+}
+.fixed-view-content {
+  padding: 0 0;
+  height: 98rpx;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  color: #fff;
+  background-color: #ccc;
+  z-index: 99;
+  .fixed-items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .tarimg {
+    width: 44rpx;
+    height: 44rpx;
+    margin-bottom: 8rpx;
+    margin-top: 7rpx;
+  }
+  .displayname {
+    font-size: 22rpx;
+    color: #000;
+  }
+}
+.ui-fixed-view {
+  position: static;
+}
+</style>
+
